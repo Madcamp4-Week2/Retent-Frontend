@@ -19,31 +19,48 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Test App"),
         ),
-      body: Center(
-        child: Container(
-          padding: const EdgeInsets.all(8),
-          width: 100,
-          height: 100,
-          clipBehavior: Clip.antiAlias,  //what happens if child clips with parent
-          alignment: Alignment.center, //location of child
-          decoration: BoxDecoration(
-            color: Colors.amber,
-            borderRadius: BorderRadius.circular(10),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey,
-                blurRadius: 6,
-              ),
-            ]),
-          child: Text(
-            "I am a box",
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              fontSize: 20,
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
+      body: Container(
+        color: Colors.grey,
+        child: Column( //row crossaxisalignment depends on parent
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: <Widget>[
+            Container(
+              padding: const EdgeInsets.all(8),
+              width: 100,
+              height: 100,
+              color: Colors.red,
+              alignment: Alignment.center,
+              child: Text(
+                "First Box",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,),),
             ),
-          ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              width: 100,
+              height: 100,
+              color: Colors.green,
+              alignment: Alignment.center,
+              child: Text(
+                "Second Box",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,),),
+            ),
+            Container(
+              padding: const EdgeInsets.all(8),
+              width: 100,
+              height: 100,
+              color: Colors.blue,
+              alignment: Alignment.center,
+              child: Text(
+                "Third Box",
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.bold,),),
+            ),
+          ],
         ),
       ),
     );
