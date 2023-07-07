@@ -19,50 +19,49 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(
         title: Text("Test App"),
         ),
-      body: Container(
-        color: Colors.grey,
-        child: Column( //row crossaxisalignment depends on parent
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: <Widget>[
-            Container(
-              padding: const EdgeInsets.all(8),
-              width: 100,
-              height: 100,
-              color: Colors.red,
-              alignment: Alignment.center,
-              child: Text(
-                "First Box",
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,),),
+      body: Center(
+        child: Container(
+          height: 100,
+          width: 100,
+          color: Colors.amber
+        ),
+      ),
+      drawer: Drawer(
+        child: ListView( //list of views inside the drawer
+          padding: const EdgeInsets.all(0),
+          children: <Widget>[ //widgets are listed in an array
+            UserAccountsDrawerHeader(
+              accountName: Text("Jack"),
+              accountEmail: Text("Jack@gmail.com"),
+              currentAccountPicture: CircleAvatar(
+                backgroundImage: NetworkImage(
+"https://images.unsplash.com/photo-1682686581854-5e71f58e7e3f?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxlZGl0b3JpYWwtZmVlZHwxfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=1000&q=60"              ),
+              ),
+              decoration: BoxDecoration(
+                color: Colors.blue
+              ),
             ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              width: 100,
-              height: 100,
-              color: Colors.green,
-              alignment: Alignment.center,
-              child: Text(
-                "Second Box",
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,),),
+            ListTile(
+              leading: Icon(Icons.person),
+              title: Text("Random Profile"),
+              subtitle: Text("a person"),
+              trailing: Icon(Icons.edit),
+              onTap: () {},
             ),
-            Container(
-              padding: const EdgeInsets.all(8),
-              width: 100,
-              height: 100,
-              color: Colors.blue,
-              alignment: Alignment.center,
-              child: Text(
-                "Third Box",
-                style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.bold,),),
-            ),
+            ListTile(
+              leading: Icon(Icons.email),
+              title: Text("Email"),
+              subtitle: Text("email address"),
+              trailing: Icon(Icons.edit),
+            )
+
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {},
+        child: Icon(Icons.edit),
+        ),
     );
   }
 }
