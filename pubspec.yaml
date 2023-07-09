@@ -43,6 +43,8 @@ dev_dependencies:
   change_app_package_name: ^1.0.0
 
   flutter_slidable: ^3.0.0
+  dropdown_button2: ^2.1.0
+  flip_card: ^0.7.0
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is

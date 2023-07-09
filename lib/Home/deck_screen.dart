@@ -2,18 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:test_project/Home/edit_card_screen.dart';
 
-class Flashcard {
-  final int id;
-  final String question;
-  final String answer;
+import 'package:test_project/flashcard.dart';
 
-  Flashcard(this.id, this.question, this.answer);
-}
 
 class DeckScreen extends StatefulWidget {
   final int deckIndex;
   
-  DeckScreen({required this.deckIndex});
+  const DeckScreen({super.key, required this.deckIndex});
 
   @override
   State<DeckScreen> createState() => _DeckScreenState();
@@ -96,34 +91,39 @@ class _DeckScreenState extends State<DeckScreen> {
         ],
       ),
       
-      body: Padding(
-        padding: const EdgeInsets.all(20.0),
+      body: Container(
+        //padding: const EdgeInsets.only(top: 20, left: 20, right: 0), //slidables을 위한 공간을 위해 0으로
         child: Column(
           children: [
-            Row(
-              children: [
-                Text(
-                '${widget.deckIndex}-th deck의 정보', // Centered text
-                style: const TextStyle(
-                  color: Colors.black, // Text color
-                  fontSize: 16.0, // Text size
-                  fontFamily: 'Pretendard', // Custom font family
-                  fontWeight: FontWeight.bold),
-                ),
-                Spacer(),
-                IconButton(
-                  onPressed: () {
-                    const snackBar = SnackBar(
-                      content: Text("배열 기준 변경")
-                    ); 
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-                  }, 
-                  icon: const Icon(Icons.sort))
-              ]
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Row(
+                children: [
+                  Text(
+                  '${widget.deckIndex}-th deck의 정보', // Centered text
+                  style: const TextStyle(
+                    color: Colors.black, // Text color
+                    fontSize: 16.0, // Text size
+                    fontFamily: 'Pretendard', // Custom font family
+                    fontWeight: FontWeight.bold),
+                  ),
+                  Spacer(),
+                  IconButton(
+                    onPressed: () {
+                      const snackBar = SnackBar(
+                        content: Text("배열 기준 변경")
+                      ); 
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                    }, 
+                    icon: const Icon(Icons.sort))
+                ]
+              ),
             ),
-            ListView.builder(
-              itemCount: _flashcardDeck.length,
-              itemBuilder: flashcardItemBuilder)
+            Expanded(
+              child: ListView.builder(
+                itemCount: _flashcardDeck.length,
+                itemBuilder: flashcardItemBuilder),
+            )
           ]
         ),
       ),
@@ -208,40 +208,50 @@ class _DeckScreenState extends State<DeckScreen> {
         onTap: () {
           moveToEditCardScreen(context, index);
         },
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          child: Card(
-            elevation: 4.0,
-            color: Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              height: 150,
-              child: Column(
-                children: [
-                  Text(
-                    flashcard.question,
-                    style: const TextStyle(
-                      color: Colors.white, // Text color
-                      fontSize: 16.0, // Text size
-                      fontFamily: 'Pretendard', // Custom font family
-                      fontWeight: FontWeight.bold)
-                  ),
-                  Text(
-                    flashcard.answer,
-                    style: const TextStyle(
-                      color: Colors.white, // Text color
-                      fontSize: 16.0, // Text size
-                      fontFamily: 'Pretendard', // Custom font family
-                      fontWeight: FontWeight.bold)
-                  ),
-                ],
+        child: Center(
+          child: Container(
+            margin: const EdgeInsets.only(top: 10, bottom: 10, left: 20, right: 20),
+            child: Card(
+              elevation: 4.0,
+              color: Colors.grey,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12.0),
               ),
-            ),
-          )
+              child: Container(
+                margin: EdgeInsets.all(20),
+                width: double.infinity,
+                alignment: Alignment.center,
+                child: Column(
+                  children: [
+                    Text(
+                      flashcard.question,
+                      style: const TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 16.0, // Text size
+                        fontFamily: 'Pretendard', // Custom font family
+                        fontWeight: FontWeight.bold)
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10),
+                      child: Divider(
+                        color: Colors.grey[700],
+                        thickness: 1.0,
+                        height: 20,
+                      ),
+                    ),
+                    Text(
+                      flashcard.answer,
+                      style: const TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 16.0, // Text size
+                        fontFamily: 'Pretendard', // Custom font family
+                        fontWeight: FontWeight.bold)
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ),
         ),
       )
 
@@ -249,17 +259,13 @@ class _DeckScreenState extends State<DeckScreen> {
   }
 
   void editCard(BuildContext context, int index) async {
-    print("shared card $index");
-
     final snackBar = SnackBar(
-      content: Text("shared card $index")
+      content: Text("editing card $index")
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar); 
   }
 
   void bookmarkCard(BuildContext context, int index) async {
-    print("bookmarked card $index");
-
     final snackBar = SnackBar(
       content: Text("bookmarked deck $index")
     ); 
@@ -267,7 +273,8 @@ class _DeckScreenState extends State<DeckScreen> {
   }
 
   void deleteCard(BuildContext context, int index) async {
-    print("deleted card $index");
+    // TODO 삭제 취소하기 버튼
+
 
     final snackBar = SnackBar(
       content: Text("deleted card $index")
@@ -280,12 +287,14 @@ class _DeckScreenState extends State<DeckScreen> {
   }
 
   void moveToEditCardScreen(BuildContext context, int index) {
+    Flashcard flashcard = _flashcardDeck[index];
+
     print("move to home");
 
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => EditCardScreen(cardIndex: index)
+        builder: (context) => EditCardScreen(flashcard: flashcard)
       ),
     );
   }

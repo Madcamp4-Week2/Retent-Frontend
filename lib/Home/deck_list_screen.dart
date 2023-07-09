@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:test_project/Home/deck_screen.dart';
+import 'package:test_project/Home/learn_deck_screen.dart';
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -38,7 +39,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
     return Slidable(
       key: Key(deck),
       endActionPane: ActionPane(
-        motion: ScrollMotion(),
+        motion: const ScrollMotion(),
         children: [
           Builder( //share button
             builder: (cont) {
@@ -48,7 +49,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   shareDeck(context, index);
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(10),
                 ),
@@ -68,7 +69,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   bookmarkDeck(context, index);
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(10),
                 ),
@@ -88,7 +89,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   deleteDeck(context, index);
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   backgroundColor: Colors.red,
                   padding: const EdgeInsets.all(10),
                 ),
@@ -108,25 +109,50 @@ class _DeckListScreenState extends State<DeckListScreen> {
           moveToDeckScreen(context, index);
         },
         child: Container(
-          margin: EdgeInsets.all(10),
+          margin: const EdgeInsets.all(10),
+          height: 80,
           child: Card(
             elevation: 4.0,
             color: Colors.grey,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12.0),
             ),
-            child: Container(
-              width: double.infinity,
-              alignment: Alignment.center,
-              height: 50,
-              child: Text(
-                deck,
-                style: const TextStyle(
-                  color: Colors.white, // Text color
-                  fontSize: 16.0, // Text size
-                  fontFamily: 'Pretendard', // Custom font family
-                  fontWeight: FontWeight.bold)
-              ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    //width: double.infinity,
+                    alignment: Alignment.centerLeft,
+                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      deck,
+                      style: const TextStyle(
+                        color: Colors.white, // Text color
+                        fontSize: 16.0, // Text size
+                        fontFamily: 'Pretendard', // Custom font family
+                        fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                ),
+                Container(
+                  alignment: Alignment.centerRight,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      moveToLearnScreen(context, index);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                      backgroundColor: Colors.white,
+                      padding: const EdgeInsets.all(2),
+                    ),
+                    child: const Icon(
+                      Icons.play_arrow,
+                      color: Colors.greenAccent,
+                      size: 30,
+                    ),
+                  ),
+                )
+              ],
             ),
           )
         ),
@@ -136,8 +162,6 @@ class _DeckListScreenState extends State<DeckListScreen> {
   }
 
   void shareDeck(BuildContext context, int index) async {
-    print("shared deck $index");
-
     final snackBar = SnackBar(
       content: Text("shared deck $index")
     );
@@ -145,8 +169,6 @@ class _DeckListScreenState extends State<DeckListScreen> {
   }
 
   void bookmarkDeck(BuildContext context, int index) async {
-    print("bookmarked deck $index");
-
     final snackBar = SnackBar(
       content: Text("bookmarked deck $index")
     ); 
@@ -154,8 +176,6 @@ class _DeckListScreenState extends State<DeckListScreen> {
   }
 
   void deleteDeck(BuildContext context, int index) async {
-    print("deleted deck $index");
-
     final snackBar = SnackBar(
       content: Text("deleted deck $index")
     );
@@ -173,6 +193,22 @@ class _DeckListScreenState extends State<DeckListScreen> {
       context, 
       MaterialPageRoute(
         builder: (context) => DeckScreen(deckIndex: index)
+      ),
+    );
+  }
+
+  void moveToLearnScreen(BuildContext context, int index) {
+    print("move to home");
+
+    final snackBar = SnackBar(
+      content: Text("Learn deck $index")
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => LearnDeckScreen(deckIndex: index)
       ),
     );
   }
