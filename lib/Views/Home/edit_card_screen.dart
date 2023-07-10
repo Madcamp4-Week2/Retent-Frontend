@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:test_project/Home/deck_screen.dart';
+import 'package:test_project/Views/Home/deck_screen.dart';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 
-import 'package:test_project/flashcard.dart';
+import 'package:test_project/Models/flashcard.dart';
 
 class EditCardScreen extends StatefulWidget {
   final Flashcard flashcard;

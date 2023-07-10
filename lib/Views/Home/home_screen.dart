@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test_project/auth_provider.dart';
 import 'deck_list_screen.dart';
 import 'stats_screen.dart';
 import 'market_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int userId;
+
+  const HomeScreen({super.key, required this.userId});
 
   @override
   State<HomeScreen> createState() =>  _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _currentIndex = 0;
+  int _currentIndex = 1;
 
   final List<Widget> _pages = [
     MarketScreen(),
@@ -21,9 +25,13 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final loginState = Provider.of<LoginState>(context, listen: true);
+
+    final email = loginState.email;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Retent'),
+        title: Text('Retent $email'),
       ),
       body: IndexedStack(
         index: _currentIndex,

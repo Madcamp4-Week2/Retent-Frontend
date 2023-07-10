@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:test_project/Home/edit_card_screen.dart';
+import 'package:test_project/Views/Home/edit_card_screen.dart';
 
-import 'package:test_project/flashcard.dart';
+import 'package:test_project/Models/flashcard.dart';
 
 
 class DeckScreen extends StatefulWidget {
@@ -17,34 +17,159 @@ class DeckScreen extends StatefulWidget {
 class _DeckScreenState extends State<DeckScreen> {
   final String _deckName = 'Physics';
 
-  final List<Flashcard> _flashcardDeck = [
+  final List<Flashcard> flashcardDeck = [
     Flashcard(
-      1,
-      'What is Newton\'s first law of motion?',
-      'An object at rest tends to stay at rest, and an object in motion tends to stay in motion with the same speed and in the same direction unless acted upon by an external force.',
+      id: 1,
+      answerCorrect: true,
+      question: "What is the capital of France?",
+      answer: "Paris",
+      interval: 5,
+      deck: 1,
+      answerTime: 10,
+      cardFavorite: false,
     ),
     Flashcard(
-      2,
-      'What is the equation for calculating force?',
-      'Force = mass x acceleration',
+      id: 2,
+      answerCorrect: true,
+      question: "What is the chemical symbol for gold?",
+      answer: "Au",
+      interval: 5,
+      deck: 1,
+      answerTime: 15,
+      cardFavorite: true,
     ),
     Flashcard(
-      3,
-      'What is the unit of measurement for electric current?',
-      'Ampere (A)',
+      id: 3,
+      answerCorrect: false,
+      question: "Who wrote the novel 'Pride and Prejudice'?",
+      answer: "Jane Austen",
+      interval: 5,
+      deck: 2,
+      answerTime: 12,
+      cardFavorite: false,
     ),
     Flashcard(
-      4,
-      'What is the formula for calculating electrical power?',
-      'Power = voltage x current',
+      id: 4,
+      answerCorrect: true,
+      question: "What is the capital of Japan?",
+      answer: "Tokyo",
+      interval: 5,
+      deck: 1,
+      answerTime: 8,
+      cardFavorite: true,
     ),
     Flashcard(
-      5,
-      'What is the speed of light in a vacuum?',
-      'Approximately 299,792,458 meters per second (m/s)',
+      id: 5,
+      answerCorrect: true,
+      question: "What is the largest planet in our solar system?",
+      answer: "Jupiter",
+      interval: 5,
+      deck: 3,
+      answerTime: 10,
+      cardFavorite: false,
+    ),
+    Flashcard(
+      id: 6,
+      answerCorrect: false,
+      question: "What is the chemical symbol for iron?",
+      answer: "Fe",
+      interval: 5,
+      deck: 1,
+      answerTime: 12,
+      cardFavorite: true,
+    ),
+    Flashcard(
+      id: 7,
+      answerCorrect: true,
+      question: "Who painted the Mona Lisa?",
+      answer: "Leonardo da Vinci",
+      interval: 5,
+      deck: 4,
+      answerTime: 15,
+      cardFavorite: false,
+    ),
+    Flashcard(
+      id: 8,
+      answerCorrect: false,
+      question: "What is the largest ocean in the world?",
+      answer: "Pacific Ocean",
+      interval: 5,
+      deck: 3,
+      answerTime: 10,
+      cardFavorite: true,
+    ),
+    Flashcard(
+      id: 9,
+      answerCorrect: true,
+      question: "What is the capital of Brazil?",
+      answer: "Brasília",
+      interval: 5,
+      deck: 1,
+      answerTime: 12,
+      cardFavorite: false,
+    ),
+    Flashcard(
+      id: 10,
+      answerCorrect: true,
+      question: "Who wrote the play 'Romeo and Juliet'?",
+      answer: "William Shakespeare",
+      interval: 5,
+      deck: 2,
+      answerTime: 10,
+      cardFavorite: true,
+    ),
+    Flashcard(
+      id: 11,
+      answerCorrect: false,
+      question: "What is the chemical symbol for sodium?",
+      answer: "Na",
+      interval: 5,
+      deck: 1,
+      answerTime: 8,
+      cardFavorite: false,
+    ),
+    Flashcard(
+      id: 12,
+      answerCorrect: true,
+      question: "Who painted the 'Starry Night'?",
+      answer: "Vincent van Gogh",
+      interval: 5,
+      deck: 4,
+      answerTime: 15,
+      cardFavorite: true,
+    ),
+    Flashcard(
+      id: 13,
+      answerCorrect: false,
+      question: "What is the largest continent in the world?",
+      answer: "Asia",
+      interval: 5,
+      deck: 3,
+      answerTime: 12,
+      cardFavorite: false,
+    ),
+    Flashcard(
+      id: 14,
+      answerCorrect: true,
+      question: "What is the capital of Australia?",
+      answer: "Canberra",
+      interval: 5,
+      deck: 1,
+      answerTime: 10,
+      cardFavorite: true,
+    ),
+    Flashcard(
+      id: 15,
+      answerCorrect: false,
+      question: "Who wrote the novel 'To Kill a Mockingbird'?",
+      answer: "Harper Lee",
+      interval: 5,
+      deck: 2,
+      answerTime: 12,
+      cardFavorite: false,
     ),
   ];
-
+   
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -121,7 +246,7 @@ class _DeckScreenState extends State<DeckScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: _flashcardDeck.length,
+                itemCount: flashcardDeck.length,
                 itemBuilder: flashcardItemBuilder),
             )
           ]
@@ -131,7 +256,7 @@ class _DeckScreenState extends State<DeckScreen> {
   }
 
   Widget flashcardItemBuilder(BuildContext context, int index) {
-    final Flashcard flashcard = _flashcardDeck[index];
+    final Flashcard flashcard = flashcardDeck[index];
 
     bool isBookmarked = false;
 
@@ -282,12 +407,12 @@ class _DeckScreenState extends State<DeckScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar); 
 
     setState(() {
-      _flashcardDeck.removeAt(index);
+      flashcardDeck.removeAt(index);
     });
   }
 
   void moveToEditCardScreen(BuildContext context, int index) {
-    Flashcard flashcard = _flashcardDeck[index];
+    Flashcard flashcard = flashcardDeck[index];
 
     print("move to home");
 

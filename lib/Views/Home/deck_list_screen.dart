@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
-import 'package:test_project/Home/deck_screen.dart';
-import 'package:test_project/Home/learn_deck_screen.dart';
+import 'package:test_project/Models/deck.dart';
+import 'package:test_project/Services/base_client.dart';
+import 'package:test_project/Views/Home/deck_screen.dart';
+import 'package:test_project/Views/Home/learn_deck_screen.dart';
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -11,33 +13,53 @@ class DeckListScreen extends StatefulWidget {
 }
 
 class _DeckListScreenState extends State<DeckListScreen> {
-  final List<String> _decks = [
-    'Deck 1',
-    'Deck 2',
-    'Deck 3','Deck 1',
-    'Deck 2',
-    'Deck 3','Deck 1',
-    'Deck 2',
-    'Deck 3','Deck 1',
-    'Deck 2',
-    'Deck 3',
-  ]; //dummy data
+  // final List<String> _decks = [
+  //   'Deck 1',
+  //   'Deck 2',
+  //   'Deck 3','Deck 1',
+  //   'Deck 2',
+  //   'Deck 3','Deck 1',
+  //   'Deck 2',
+  //   'Deck 3','Deck 1',
+  //   'Deck 2',
+  //   'Deck 3',
+  // ]; //dummy data
+
+  final userId = 1;
+
+  List<Deck>? myDecks;
+
+  @override
+  void initState() {
+    super.initState();
+    
+    myDecks = getMyDecksDB() as List<Deck>?;
+  }
+
+  Future<List<Deck>?> getMyDecksDB() async {
+    var response = await BaseClient().get('/flash-card/decks/{$userId}/');
+    if (response == null) {
+      debugPrint("getMyDecks unsuccessfull");
+      return List.empty();
+    }
+    return deckFromJson(response.body);
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: ListView.builder(
-        itemCount: _decks.length,
+        itemCount: myDecks!.length,
         itemBuilder: deckItemBuilder
       ),
     );
   }
 
   Widget deckItemBuilder(BuildContext context, int index) {
-    final deck = _decks[index];
+    final deck = myDecks![index];
 
     return Slidable(
-      key: Key(deck),
+      key: Key(deck.deckName),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
@@ -125,7 +147,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                     alignment: Alignment.centerLeft,
                     margin: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
-                      deck,
+                      deck.deckName,
                       style: const TextStyle(
                         color: Colors.white, // Text color
                         fontSize: 16.0, // Text size
@@ -182,7 +204,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
     ScaffoldMessenger.of(context).showSnackBar(snackBar); 
 
     setState(() {
-      _decks.removeAt(index);
+      myDecks!.removeAt(index);
     });
   }
 

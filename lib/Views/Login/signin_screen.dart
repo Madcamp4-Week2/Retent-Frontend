@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
-import 'package:test_project/Login/login_platform.dart';
+import 'package:test_project/Views/Login/signin_form_screen.dart';
+import 'package:test_project/Views/Login/login_platform.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
@@ -199,7 +200,12 @@ class _SignInScreenState extends State<SignInScreen> {
   }
 
   void signInWithEmail() async {
-
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => SignInFormScreen()
+      ),
+    );
   }
 
   void signInWithGoogle() async {

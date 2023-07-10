@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 
 import 'package:kakao_flutter_sdk_common/kakao_flutter_sdk_common.dart';
-import 'package:test_project/Login/signin_screen.dart';
-import 'package:test_project/Login/start_screen.dart';
+import 'package:provider/provider.dart';
+import 'package:test_project/Views/Login/signin_screen.dart';
+import 'package:test_project/Views/Login/start_screen.dart';
+import 'package:test_project/auth_provider.dart';
 
 void main() {
 
@@ -19,13 +21,16 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        fontFamily: 'Pretendard',
+    return ChangeNotifierProvider(
+      create: (context) => LoginState(),
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          fontFamily: 'Pretendard',
+        ),
+        home: const StartScreen(), // 로그인 스크린
       ),
-      home: const StartScreen(), // 로그인 스크린
     );
   }
 }
