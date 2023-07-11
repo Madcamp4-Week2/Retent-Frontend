@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_project/Views/Home/home_screen.dart';
@@ -11,7 +10,7 @@ import 'dart:convert'; //Json
 import 'dart:io';
 
 import 'package:test_project/auth_provider.dart'; //HttpsHeader
-
+import 'package:test_project/Services/api_user.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -34,19 +33,18 @@ class _SignInScreenState extends State<SignInScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
-        child: _loginPlatform != LoginPlatform.none?
-        StartButton():
-        Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            _loginKakaoButton(),
-            const SizedBox(height: 16.0),
-            _loginGoogleButton(),
-            const SizedBox(height: 16.0),
-            _loginEmailButton(),
-          ],
-        )
-      ),
+          child: _loginPlatform != LoginPlatform.none
+              ? StartButton()
+              : Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _loginKakaoButton(),
+                    const SizedBox(height: 16.0),
+                    _loginGoogleButton(),
+                    const SizedBox(height: 16.0),
+                    _loginEmailButton(),
+                  ],
+                )),
     );
   }
 
@@ -58,10 +56,11 @@ class _SignInScreenState extends State<SignInScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey,
         shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // Rounded border
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Button padding
-      elevation: 2.0, // Shadow elevation
+          borderRadius: BorderRadius.circular(10.0), // Rounded border
+        ),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16.0, vertical: 12.0), // Button padding
+        elevation: 2.0, // Shadow elevation
       ),
       child: Container(
         padding: const EdgeInsets.all(10.0),
@@ -77,16 +76,14 @@ class _SignInScreenState extends State<SignInScreen> {
             const Text(
               '카카오 로그인', // Centered text
               style: TextStyle(
-                color: Colors.white, // Text color
-                fontSize: 16.0, // Text size
-                fontFamily: 'Pretendard', // Custom font family
-                fontWeight: FontWeight.normal
-              ),
+                  color: Colors.white, // Text color
+                  fontSize: 16.0, // Text size
+                  fontFamily: 'Pretendard', // Custom font family
+                  fontWeight: FontWeight.normal),
             ),
           ],
         ),
       ),
-      
     );
   }
 
@@ -98,10 +95,11 @@ class _SignInScreenState extends State<SignInScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey,
         shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // Rounded border
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Button padding
-      elevation: 2.0, // Shadow elevation
+          borderRadius: BorderRadius.circular(10.0), // Rounded border
+        ),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16.0, vertical: 12.0), // Button padding
+        elevation: 2.0, // Shadow elevation
       ),
       child: Container(
         padding: const EdgeInsets.all(10.0),
@@ -117,16 +115,14 @@ class _SignInScreenState extends State<SignInScreen> {
             const Text(
               '구글 로그인', // Centered text
               style: TextStyle(
-                color: Colors.white, // Text color
-                fontSize: 16.0, // Text size
-                fontFamily: 'Pretendard', // Custom font family
-                fontWeight: FontWeight.normal
-              ),
+                  color: Colors.white, // Text color
+                  fontSize: 16.0, // Text size
+                  fontFamily: 'Pretendard', // Custom font family
+                  fontWeight: FontWeight.normal),
             ),
           ],
         ),
       ),
-      
     );
   }
 
@@ -138,10 +134,11 @@ class _SignInScreenState extends State<SignInScreen> {
       style: ElevatedButton.styleFrom(
         backgroundColor: Colors.blueGrey,
         shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(10.0), // Rounded border
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0), // Button padding
-      elevation: 2.0, // Shadow elevation
+          borderRadius: BorderRadius.circular(10.0), // Rounded border
+        ),
+        padding: const EdgeInsets.symmetric(
+            horizontal: 16.0, vertical: 12.0), // Button padding
+        elevation: 2.0, // Shadow elevation
       ),
       child: Container(
         padding: const EdgeInsets.all(10.0),
@@ -157,16 +154,14 @@ class _SignInScreenState extends State<SignInScreen> {
             const Text(
               '이메일 로그인', // Centered text
               style: TextStyle(
-                color: Colors.white, // Text color
-                fontSize: 16.0, // Text size
-                fontFamily: 'Pretendard', // Custom font family
-                fontWeight: FontWeight.normal
-              ),
+                  color: Colors.white, // Text color
+                  fontSize: 16.0, // Text size
+                  fontFamily: 'Pretendard', // Custom font family
+                  fontWeight: FontWeight.normal),
             ),
           ],
         ),
       ),
-      
     );
   }
 
@@ -209,39 +204,39 @@ class _SignInScreenState extends State<SignInScreen> {
 
       final url = Uri.https('kapi.kakao.com', '/v2/user/me');
 
-      final response = await http.get( // 토큰으로 response을 받음
+      final response = await http.get(
+        // 토큰으로 response을 받음
         url,
         headers: {
           HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
         },
       );
 
-      final profileInfo = json.decode(response.body); // 로그인 후 프로필 정보를 response에서 받음
+      final profileInfo =
+          json.decode(response.body); // 로그인 후 프로필 정보를 response에서 받음
 
       loginState.updateEmail(profileInfo['kakao_account']['email']);
       print(loginState.email);
 
-      setState(() { // 카카오톡으로 로그인했음으로 저장
+      setState(() {
+        // 카카오톡으로 로그인했음으로 저장
         _loginPlatform = LoginPlatform.kakao;
       });
 
-    } catch (error) { 
+      signKakao(token.accessToken);
+    } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
     }
   }
 
   void signInWithEmail() async {
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => SignInFormScreen()
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => SignInFormScreen()),
     );
   }
 
-  void signInWithGoogle() async {
-
-  }
+  void signInWithGoogle() async {}
 
   void signOut() async {
     switch (_loginPlatform) {
@@ -256,7 +251,8 @@ class _SignInScreenState extends State<SignInScreen> {
         break;
     }
 
-    setState(() { // 로그인 안했음으로 저장
+    setState(() {
+      // 로그인 안했음으로 저장
       _loginPlatform = LoginPlatform.none;
     });
   }
@@ -265,11 +261,8 @@ class _SignInScreenState extends State<SignInScreen> {
     print("move to home");
 
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => HomeScreen()
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   }
-
 }
