@@ -9,29 +9,25 @@ const String baseUrl = 'https://147e-143-248-200-57.ngrok-free.app/retent';
 class BaseClient {
   var client = http.Client();
 
-  Future<dynamic> get(String api) async { // TODO headers????
+  Future<dynamic> get(String api) async {
+    // TODO headers????
     var uri = Uri.parse(baseUrl + api); //fill uri
 
     var response = await client.get(uri);
     if (response.statusCode == 200) {
       return response.body;
-    } else {
-
-    }
-  } 
+    } else {}
+  }
 
   Future<dynamic> post(String api, dynamic object) async {
     var uri = Uri.parse(baseUrl + api); //fill uri
     var _payload = json.encode(object);
 
-    var response = await client.post(uri, 
-      body: _payload, 
-      headers: {"Content-Type": "application/json"});
-    if (response.statusCode == 201) {
+    var response = await client.post(uri,
+        body: _payload, headers: {"Content-Type": "application/json"});
+    if (response.statusCode == 201 || response.statusCode == 200) {
       return response.body;
-    } else {
-      
-    }
+    } else {}
   }
 
   Future<dynamic> put(String api, dynamic object) async {
@@ -41,9 +37,7 @@ class BaseClient {
     var response = await client.put(uri, body: _payload);
     if (response.statusCode == 200) {
       return response.body;
-    } else {
-      
-    }
+    } else {}
   }
 
   Future<dynamic> patch(String api, dynamic object) async {
@@ -53,9 +47,7 @@ class BaseClient {
     var response = await client.patch(uri, body: _payload);
     if (response.statusCode == 200) {
       return response.body;
-    } else {
-      
-    }
+    } else {}
   }
 
   Future<dynamic> delete(String api) async {
@@ -64,10 +56,6 @@ class BaseClient {
     var response = await client.delete(uri);
     if (response.statusCode == 200) {
       return response.body;
-    } else {
-      
-    }
+    } else {}
   }
-
-
 }
