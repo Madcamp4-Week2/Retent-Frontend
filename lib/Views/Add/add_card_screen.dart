@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Models/tag.dart';
-import 'package:test_project/Services/api_calls.dart';
+import 'package:test_project/Services/api_card.dart';
+import 'package:test_project/Services/api_deck.dart';
 import 'package:test_project/Views/Home/deck_screen.dart';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 
 import 'package:test_project/Models/flashcard.dart';
+import 'package:test_project/auth_provider.dart';
 
 class AddCardScreen extends StatefulWidget {
-  final Deck? parentDeck;
+  final Deck newDeck;
 
-  const AddCardScreen({super.key, required this.parentDeck});
+  const AddCardScreen({super.key, required this.newDeck});
 
   @override
   State<AddCardScreen> createState() => _AddCardScreenState();
@@ -19,6 +22,7 @@ class AddCardScreen extends StatefulWidget {
 
 class _AddCardScreenState extends State<AddCardScreen> {
   int? selectedDeckId;
+  late int userId;
 
   List<Tag> myTagList = [];
   List<Deck> myDeckList = []; // TODO db써서 가져오기
@@ -35,13 +39,18 @@ class _AddCardScreenState extends State<AddCardScreen> {
     super.dispose();
   }
 
+  void getMyDeck(userId) async {
+    myDeckList = await getMyDecksDB(userId);
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
-    myDeckList = [
-      Deck(id: 1, deckName: "Deck 1", user: 1, deckFavorite: true),
-      Deck(id: 2, deckName: "Deck 2", user: 2, deckFavorite: false),
-      Deck(id: 3, deckName: "Deck 3", user: 1, deckFavorite: true),
-    ];
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      userId = loginState.userId; // TODO
+      getMyDeck(userId);
+    });
 
     return Scaffold(
       appBar: AppBar(
@@ -207,15 +216,9 @@ class _AddCardScreenState extends State<AddCardScreen> {
         content: Text("덱 안고름")
       )); 
     } else {
-      //saveEditedCardDB(newQuestion, newAnswer, newDeck);
-      final newCard = Flashcard(
-        id: 10, // TODO FIX!!!!!!
-        question: newQuestion, 
-        answer: newAnswer,
-        deck: selectedDeckId!,
-      );
+      postCardDB(widget.newDeck.id, newQuestion, newAnswer);
 
-      Navigator.pop(context, newCard);
+      Navigator.pop(context);
     }
   }
 }

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/Models/user.dart';
+import 'package:test_project/Services/api_user.dart';
 import 'package:test_project/Services/base_client.dart';
 
 class SignInFormScreen extends StatefulWidget {
@@ -41,31 +42,19 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
 
       // Show a success message or navigate to the next screen
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text('Sign-in successful!'),
         ),
       );
     }
   }
 
-  void signinUserDB(String nickname, String email, String password1, String password2) async {
-    var response = await BaseClient().post(
-      'dj-rest-auth/registration/', 
-      {"email" : email, "password1" : password1, "password2" : password2, "nickname" : nickname},
-    );
-    if (response == null) {
-      debugPrint("failed post User");
-      return;
-    }
-    debugPrint("successful post User"); 
-
-  }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('회원가입'),
+        title: const Text('회원가입'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -86,10 +75,10 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               TextFormField(
                 controller: _nicknameController,
-                decoration: InputDecoration(
+                decoration: const InputDecoration(
                   labelText: '닉네임',
                 ),
                 validator: (value) {
@@ -99,7 +88,7 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               TextFormField(
                 controller: _passwordController,
                 decoration: const InputDecoration(
@@ -113,7 +102,7 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
                   return null;
                 },
               ),
-              SizedBox(height: 24.0),
+              const SizedBox(height: 24.0),
               TextFormField(
                 controller: _confirmPasswordController,
                 decoration: const InputDecoration(
@@ -130,7 +119,7 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
                   return null;
                 },
               ),
-              Spacer(),
+              const Spacer(),
               Container(
                 width: double.infinity,
                 height: 50,

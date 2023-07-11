@@ -5,7 +5,7 @@ import 'package:test_project/Views/Home/learn_finish_screen.dart';
 import 'package:test_project/Models/flashcard.dart';
 
 import 'package:flip_card/flip_card.dart';
-
+import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 
 class LearnDeckScreen extends StatefulWidget {
@@ -19,17 +19,30 @@ class LearnDeckScreen extends StatefulWidget {
 
 class _LearnDeckScreenState extends State<LearnDeckScreen> {
   late BehaviorSubject<CardDragAction> willAcceptStream;
+  late Timer cardTimer;
+
+  double totalTime = 0;
+
+  void startCardTimer() {
+    cardTimer = Timer.periodic(const Duration(seconds: 1), (_) {
+    setState(() {
+      totalTime += 1;
+    });
+  });
+}
 
   @override
   void initState() {
     willAcceptStream = BehaviorSubject<CardDragAction>();
     willAcceptStream.add(CardDragAction.none);
+    startCardTimer();
     super.initState();
   }
 
   @override
   void dispose() {
     willAcceptStream.close();
+    cardTimer.cancel();
     super.dispose();
   }
 
@@ -40,8 +53,16 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
 
   double answerTime = 0;
 
+  // void getMyCards(deckId) async {
+  //     cardList = await getMyCardsDB(deckId);
+  //   }
+
+  //   print(widget.deck.id);
+
+  //   getMyCards(widget.deck.id);
+
   //db에서 불러오기
-  final List<Flashcard> flashcardDeck = [
+  final List<Flashcard> cardList = [
     Flashcard(
       id: 1,
       answerCorrect: true,
@@ -203,7 +224,7 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
       body: Column(
         children: [
           LinearProgressIndicator(
-            value: currentCardIdx/flashcardDeck.length,
+            value: currentCardIdx/cardList.length,
             color: Colors.red,
           ),
           Padding( // TODO 꾸미기
@@ -220,6 +241,23 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
                     padding: const EdgeInsets.all(8.0),
                     child: Text(
                       '$rightCount', // Centered text
+                      style: const TextStyle(
+                        color: Colors.black, // Text color
+                        fontSize: 16.0, // Text size
+                        fontFamily: 'Pretendard', // Custom font family
+                        fontWeight: FontWeight.bold)
+                    ),
+                  ),
+                ),
+                Card(
+                  color: Colors.grey[100],
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12.0),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      '$totalTime', // Centered text
                       style: const TextStyle(
                         color: Colors.black, // Text color
                         fontSize: 16.0, // Text size
@@ -251,7 +289,7 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
           SizedBox(height: 20,),
           Center(
             child: DraggableCard(
-              cardData: flashcardDeck[currentCardIdx],
+              cardData: cardList[currentCardIdx],
               onCardDragged: (result) {
                 setState(() {
                   if (result == CardDragAction.right) {
@@ -262,7 +300,7 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
                     currentCardIdx++;
                   } 
           
-                  if (currentCardIdx == flashcardDeck.length) {
+                  if (currentCardIdx == cardList.length) {
                     endOfDeck(); // infinite loop
                     currentCardIdx = 0;
                   }
@@ -314,6 +352,7 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
   }
 
   void endOfDeck() {
+    cardTimer.cancel();
     //move to end page
     const snackBar = SnackBar(
       content: Text("학습이 끝났습니다")
@@ -350,6 +389,8 @@ class _LearnDeckScreenState extends State<LearnDeckScreen> {
         builder: (context) => LearnFinishScreen(
           rightCount: rightCount,
           wrongCount: wrongCount,
+          totalTime: totalTime,
+          deckId: widget.deck.id,
         )
       ),
     );

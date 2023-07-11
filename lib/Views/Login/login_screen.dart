@@ -101,7 +101,7 @@ class _LoginScreenState extends State<LoginScreen> {
     bool loginSuccess = await loginState.login();
     if(loginSuccess) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("로그인 성공"))); 
-      moveToHomePage();
+      moveToHomeScreen();
     } else {
       showDialog(
         context: context,
@@ -119,15 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
         ),
       );
     }
-
-    // setState(() {
-    //   userId = 1;
-    // });
-
-    // moveToHomePage();
   }
 
-  void moveToHomePage() async {
+  void moveToHomeScreen() async {
     print("move to home");
 
     Navigator.push(

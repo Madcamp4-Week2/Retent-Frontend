@@ -1,13 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:test_project/Services/api_history.dart';
+import 'package:test_project/Views/Home/deck_list_screen.dart';
 
 class LearnFinishScreen extends StatefulWidget {
   final int rightCount;
   final int wrongCount;
+  final double totalTime;
+  final int deckId;
 
   LearnFinishScreen({super.key,
     required this.rightCount,
     required this.wrongCount,
+    required this.totalTime,
+    required this.deckId,
   });
 
   @override
@@ -31,7 +37,7 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
         padding: const EdgeInsets.all(10),
         child: Column(
           children: [
-            Spacer(flex: 1,),
+            const Spacer(flex: 1,),
             Container(
               width: 200,
               height: 200,
@@ -58,38 +64,44 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
                 ]
               ),
             ),
-            Spacer(flex: 1,),
+            const Spacer(flex: 1,),
             Center(
               child: Row(
                 children: [
-                  Spacer(),
+                  const Spacer(),
                   Column(
                     children: [
+                      buildTextWithStyle("총 시간", Colors.grey),
+                      buildTextWithStyle("평균 시간", Colors.grey),
+                      const SizedBox(height: 20,),
                       buildTextWithStyle("총 카드 수", Colors.grey),
                       buildTextWithStyle("맞은 카드 수", Colors.green),
                       buildTextWithStyle("틀린 카드 수", Colors.red),
                     ],
                   ),
-                  SizedBox(width: 30),
+                  const SizedBox(width: 30),
                   Column(
                     children: [
+                      buildTextWithStyle("${widget.totalTime}", Colors.grey),
+                      buildTextWithStyle("${(widget.totalTime/(widget.rightCount+widget.wrongCount)).round()}", Colors.grey),
+                      const SizedBox(height: 20,),
                       buildTextWithStyle("${widget.rightCount+widget.wrongCount}", Colors.grey),
                       buildTextWithStyle("${widget.rightCount}", Colors.green),
                       buildTextWithStyle("${widget.wrongCount}", Colors.red),
                     ],
                   ),
-                  Spacer(),
+                  const Spacer(),
                 ],
               ),
             ),
-            Spacer(flex: 1,),
+            const Spacer(flex: 1,),
             Container(
               width: double.infinity,
               height: 50,
               margin: const EdgeInsets.all(5),
               child: ElevatedButton(
                 onPressed: () {
-                  // Add your button press logic here
+                  moveToDeckListScreen();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -113,7 +125,7 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
               margin: const EdgeInsets.all(5),
               child: OutlinedButton(
                 onPressed: () {
-                  // Add your button press logic here
+                  restartLearn();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
@@ -139,16 +151,33 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
   }
 
   Widget buildTextWithStyle(String content, Color color) {
-  return Padding(
-    padding: const EdgeInsets.all(3.0),
-    child: Text(
-      content,
-      style: TextStyle(
-        color: color,
-        fontSize: 20,
-        fontWeight: FontWeight.bold,
+    return Padding(
+      padding: const EdgeInsets.all(3.0),
+      child: Text(
+        content,
+        style: TextStyle(
+          color: color,
+          fontSize: 20,
+          fontWeight: FontWeight.bold,
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
+
+  void saveHistory() {
+    postHistoryDB(widget.deckId, widget.totalTime, accuracy);
+  }
+
+  void moveToDeckListScreen() {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => DeckListScreen()
+      ),
+    );
+  }
+
+  void restartLearn() {
+
+  }
 }

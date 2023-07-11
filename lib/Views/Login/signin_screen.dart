@@ -1,12 +1,16 @@
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:test_project/Views/Home/home_screen.dart';
 import 'package:test_project/Views/Login/signin_form_screen.dart';
 import 'package:test_project/Views/Login/login_platform.dart';
 import 'package:http/http.dart' as http;
 import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
 
 import 'dart:convert'; //Json
-import 'dart:io'; //HttpsHeader
+import 'dart:io';
+
+import 'package:test_project/auth_provider.dart'; //HttpsHeader
 
 
 class SignInScreen extends StatefulWidget {
@@ -20,11 +24,18 @@ class _SignInScreenState extends State<SignInScreen> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    _loginPlatform = LoginPlatform.none;
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Center(
         child: _loginPlatform != LoginPlatform.none?
-        _logoutButton():
+        StartButton():
         Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -159,18 +170,37 @@ class _SignInScreenState extends State<SignInScreen> {
     );
   }
 
-  Widget _logoutButton() {
-    return ElevatedButton(
-      onPressed: signOut, 
-      style: ButtonStyle(
-        backgroundColor: MaterialStateProperty.all(Colors.amber)
+  Widget StartButton() {
+    return Container(
+      width: double.infinity,
+      height: 50,
+      margin: const EdgeInsets.all(30),
+      child: ElevatedButton(
+        onPressed: () {
+          moveToHomeScreen();
+        },
+        style: ElevatedButton.styleFrom(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8.0),
+          ),
+          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+          elevation: 4.0,
+        ),
+        child: const Text(
+          '시작하기',
+          style: TextStyle(
+            fontSize: 16.0,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
       ),
-      child: const Text("Logout"),
-      );
+    );
   }
 
   void signInWithKakao() async {
     try {
+      final loginState = Provider.of<LoginState>(context, listen: false);
+
       bool isInstalled = await isKakaoTalkInstalled();
 
       OAuthToken token = isInstalled
@@ -186,10 +216,10 @@ class _SignInScreenState extends State<SignInScreen> {
         },
       );
 
-      print(token.accessToken.toString());
-
       final profileInfo = json.decode(response.body); // 로그인 후 프로필 정보를 response에서 받음
-      print(profileInfo.toString());
+
+      loginState.updateEmail(profileInfo['kakao_account']['email']);
+      print(loginState.email);
 
       setState(() { // 카카오톡으로 로그인했음으로 저장
         _loginPlatform = LoginPlatform.kakao;
@@ -197,7 +227,6 @@ class _SignInScreenState extends State<SignInScreen> {
 
     } catch (error) { 
       print('카카오톡으로 로그인 실패 $error');
-        
     }
   }
 
@@ -230,6 +259,17 @@ class _SignInScreenState extends State<SignInScreen> {
     setState(() { // 로그인 안했음으로 저장
       _loginPlatform = LoginPlatform.none;
     });
+  }
+
+  void moveToHomeScreen() async {
+    print("move to home");
+
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => HomeScreen()
+      ),
+    );
   }
 
 }

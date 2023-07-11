@@ -2,20 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:provider/provider.dart';
 import 'package:test_project/Models/deck.dart';
+import 'package:test_project/Services/api_deck.dart';
 import 'package:test_project/Services/base_client.dart';
 import 'package:test_project/Views/Add/add_deck_screen.dart';
 import 'package:test_project/Views/Home/deck_screen.dart';
 import 'package:test_project/Views/Home/learn_deck_screen.dart';
 import 'package:test_project/auth_provider.dart';
-
-Future<List<Deck>> getMyDecksDB(int userId) async {
-  var response = await BaseClient().get('/flash-card/decks/{$userId}/');
-  if (response == null) {
-    debugPrint("getMyDecks unsuccessful");
-    return List.empty();
-  }
-  return deckFromJson(response.body);
-}
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -60,27 +52,24 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     });
   }
 
-  void getMyDeck(userId) async {
-    myDeckList = await getMyDecksDB(userId);
-  }
+  // void getMyDeck(userId) async {
+  //   myDeckList = await getMyDecksDB(userId);
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context, listen: false);
     setState(() {
       userId = loginState.userId; // TODO
+      getMyDecksDB(userId).then((decks) {
+        myDeckList = decks;
+      });
     });
 
     debugPrint("UserId is $userId!!!!!!!!!!!!!");
-
-    getMyDeck(userId);
-    print(myDeckList);
-
-    myDeckList = [
-      Deck(id: 1, deckName: "Deck 1", user: 1, deckFavorite: true),
-      Deck(id: 2, deckName: "Deck 2", user: 2, deckFavorite: false),
-      Deck(id: 3, deckName: "Deck 3", user: 1, deckFavorite: true),
-    ];
+    
+    print("the total list is $myDeckList");
 
     return Scaffold(
       body: myDeckList.isEmpty?
@@ -101,9 +90,9 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
-          if (_isExpanded) buildCircularButton(Icons.camera_alt, () {
-            moveToAddDeckScreen(context);
-          }),
+          // if (_isExpanded) buildCircularButton(Icons.camera_alt, () {
+          //   moveToAddDeckScreen(context);
+          // }),
           if (_isExpanded) const SizedBox(height: 16.0),
           if (_isExpanded) buildCircularButton(Icons.photo_library, () {
             moveToAddDeckScreen(context);
@@ -140,22 +129,6 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
       ScaffoldMessenger.of(context).showSnackBar(snackBar); 
     }
 
-    void bookmarkDeckDB(int deckId) async {
-      var response = await BaseClient().patch('/flash-card/decks/{$deckId}/', {"deckFavorite" : true});
-      if (response == null) {
-        debugPrint("bookmarkDeck unsuccessfull");
-      }
-      return;
-    }
-
-    void unbookmarkDeckDB(int deckId) async {
-      var response = await BaseClient().patch('/flash-card/decks/{$deckId}/', {"deckFavorite" : false});
-      if (response == null) {
-        debugPrint("unbookmarkDeck unsuccessfull");
-      }
-      return;
-    }
-
     void bookmarkDeck() async {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("bookmarked deck ${deck.deckName}")));
       isBookmarked = true;
@@ -166,14 +139,6 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("unbookmarked deck ${deck.deckName}")));
       isBookmarked = false;
       unbookmarkDeckDB(deck.id);
-    }
-
-    void deleteDeckDB(int deckId) async {
-      var response = await BaseClient().delete('/flash-card/decks/{$deckId}/');
-      if (response == null) {
-        debugPrint("deleteDeck unsuccessfull");
-      }
-      return;
     }
 
     void deleteDeck() async {

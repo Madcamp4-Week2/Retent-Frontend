@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:test_project/Models/deck.dart';
-import 'package:test_project/Services/api_calls.dart';
+import 'package:test_project/Services/api_card.dart';
+import 'package:test_project/Services/api_deck.dart';
 import 'package:test_project/Services/base_client.dart';
 import 'package:test_project/Views/Home/edit_card_screen.dart';
 
@@ -19,172 +20,28 @@ class DeckScreen extends StatefulWidget {
 
 class _DeckScreenState extends State<DeckScreen> {
   List<Flashcard> cardList = [];
+  late Deck deck;
+
+  void getMyCards(deckId) async {
+    cardList = await getMyCardsDB(deckId);
+    setState(() {});
+  }
+
+  @override
+  void initState() {
+    super.initState();
+  }
   
   @override
   Widget build(BuildContext context) {
-    Deck deck = widget.deck;
-
-    //flashcardDeck = getMyCardsDB(deck.deckId) as List<Flashcard>;
-
-    void getMyCards(deckId) async {
-      cardList = await getMyCardsDB(deckId);
-    }
-
-    getMyCards(deck.id);
-
-    cardList = [
-    Flashcard(
-      id: 1,
-      answerCorrect: true,
-      question: "What is the capital of France?",
-      answer: "Paris",
-      interval: 5,
-      deck: 1,
-      answerTime: 10,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 2,
-      answerCorrect: true,
-      question: "What is the chemical symbol for gold?",
-      answer: "Au",
-      interval: 5,
-      deck: 1,
-      answerTime: 15,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 3,
-      answerCorrect: false,
-      question: "Who wrote the novel 'Pride and Prejudice'?",
-      answer: "Jane Austen",
-      interval: 5,
-      deck: 2,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 4,
-      answerCorrect: true,
-      question: "What is the capital of Japan?",
-      answer: "Tokyo",
-      interval: 5,
-      deck: 1,
-      answerTime: 8,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 5,
-      answerCorrect: true,
-      question: "What is the largest planet in our solar system?",
-      answer: "Jupiter",
-      interval: 5,
-      deck: 3,
-      answerTime: 10,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 6,
-      answerCorrect: false,
-      question: "What is the chemical symbol for iron?",
-      answer: "Fe",
-      interval: 5,
-      deck: 1,
-      answerTime: 12,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 7,
-      answerCorrect: true,
-      question: "Who painted the Mona Lisa?",
-      answer: "Leonardo da Vinci",
-      interval: 5,
-      deck: 4,
-      answerTime: 15,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 8,
-      answerCorrect: false,
-      question: "What is the largest ocean in the world?",
-      answer: "Pacific Ocean",
-      interval: 5,
-      deck: 3,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 9,
-      answerCorrect: true,
-      question: "What is the capital of Brazil?",
-      answer: "Brasília",
-      interval: 5,
-      deck: 1,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 10,
-      answerCorrect: true,
-      question: "Who wrote the play 'Romeo and Juliet'?",
-      answer: "William Shakespeare",
-      interval: 5,
-      deck: 2,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 11,
-      answerCorrect: false,
-      question: "What is the chemical symbol for sodium?",
-      answer: "Na",
-      interval: 5,
-      deck: 1,
-      answerTime: 8,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 12,
-      answerCorrect: true,
-      question: "Who painted the 'Starry Night'?",
-      answer: "Vincent van Gogh",
-      interval: 5,
-      deck: 4,
-      answerTime: 15,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 13,
-      answerCorrect: false,
-      question: "What is the largest continent in the world?",
-      answer: "Asia",
-      interval: 5,
-      deck: 3,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 14,
-      answerCorrect: true,
-      question: "What is the capital of Australia?",
-      answer: "Canberra",
-      interval: 5,
-      deck: 1,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 15,
-      answerCorrect: false,
-      question: "Who wrote the novel 'To Kill a Mockingbird'?",
-      answer: "Harper Lee",
-      interval: 5,
-      deck: 2,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-  ];
-   
+    setState(() {
+      deck = widget.deck;
+      int deckId = deck.id;
+      print(deckId);
+      getMyCards(deckId);
+    });
+    
+    print("the deck is a list of $deck");
 
     return Scaffold(
       appBar: AppBar(

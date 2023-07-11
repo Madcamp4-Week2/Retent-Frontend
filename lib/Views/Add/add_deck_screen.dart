@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 import 'package:test_project/Models/deck.dart';
+import 'package:test_project/Services/api_card.dart';
+import 'package:test_project/Services/api_deck.dart';
 import 'package:test_project/Services/base_client.dart';
 import 'package:test_project/Views/Add/add_card_screen.dart';
 import 'package:test_project/Views/Home/edit_card_screen.dart';
 
 import 'package:test_project/Models/flashcard.dart';
+import 'package:test_project/auth_provider.dart';
 
 
 class AddDeckScreen extends StatefulWidget {
@@ -17,6 +21,10 @@ class AddDeckScreen extends StatefulWidget {
 
 class _AddDeckScreenState extends State<AddDeckScreen> {
   List<Flashcard> currentCardList = [];
+  late int userId;
+
+  Deck newDeck = Deck(id: 0, deckName: "임시", user: 0); // Temp value
+  bool isDeckInitialized = false; 
 
   final TextEditingController textEditingController = TextEditingController();
 
@@ -27,183 +35,214 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
   //   }
   // }
 
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    
+  void initNewDeck(int userId) async {
+    final deck = await postDeckDB("name", userId);
+    setState(() {
+      if (deck != null) {
+        newDeck = deck;
+        isDeckInitialized = true; // Mark the newDeck as initialized
+    }
+    else isDeckInitialized = false;
+    });
   }
 
-  // void addNewDeck() {
-  //   Deck
+  @override
+  void initState() {
+    super.initState();
 
-  //   newDeck = Deck(deckName: deckName, user: user)
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      userId = loginState.userId; // TODO
+    });
+    initNewDeck(userId);
+  }
 
-  //   addNewDeckDB(newDeck);
-  // }
-  
   @override
   Widget build(BuildContext context) {
+    // final loginState = Provider.of<LoginState>(context, listen: false);
+    // setState(() {
+    //   userId = loginState.userId; // TODO
+    // });
 
-    currentCardList = [
-    Flashcard(
-      id: 1,
-      answerCorrect: true,
-      question: "What is the capital of France?",
-      answer: "Paris",
-      interval: 5,
-      deck: 1,
-      answerTime: 10,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 2,
-      answerCorrect: true,
-      question: "What is the chemical symbol for gold?",
-      answer: "Au",
-      interval: 5,
-      deck: 1,
-      answerTime: 15,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 3,
-      answerCorrect: false,
-      question: "Who wrote the novel 'Pride and Prejudice'?",
-      answer: "Jane Austen",
-      interval: 5,
-      deck: 2,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 4,
-      answerCorrect: true,
-      question: "What is the capital of Japan?",
-      answer: "Tokyo",
-      interval: 5,
-      deck: 1,
-      answerTime: 8,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 5,
-      answerCorrect: true,
-      question: "What is the largest planet in our solar system?",
-      answer: "Jupiter",
-      interval: 5,
-      deck: 3,
-      answerTime: 10,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 6,
-      answerCorrect: false,
-      question: "What is the chemical symbol for iron?",
-      answer: "Fe",
-      interval: 5,
-      deck: 1,
-      answerTime: 12,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 7,
-      answerCorrect: true,
-      question: "Who painted the Mona Lisa?",
-      answer: "Leonardo da Vinci",
-      interval: 5,
-      deck: 4,
-      answerTime: 15,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 8,
-      answerCorrect: false,
-      question: "What is the largest ocean in the world?",
-      answer: "Pacific Ocean",
-      interval: 5,
-      deck: 3,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 9,
-      answerCorrect: true,
-      question: "What is the capital of Brazil?",
-      answer: "Brasília",
-      interval: 5,
-      deck: 1,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 10,
-      answerCorrect: true,
-      question: "Who wrote the play 'Romeo and Juliet'?",
-      answer: "William Shakespeare",
-      interval: 5,
-      deck: 2,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 11,
-      answerCorrect: false,
-      question: "What is the chemical symbol for sodium?",
-      answer: "Na",
-      interval: 5,
-      deck: 1,
-      answerTime: 8,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 12,
-      answerCorrect: true,
-      question: "Who painted the 'Starry Night'?",
-      answer: "Vincent van Gogh",
-      interval: 5,
-      deck: 4,
-      answerTime: 15,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 13,
-      answerCorrect: false,
-      question: "What is the largest continent in the world?",
-      answer: "Asia",
-      interval: 5,
-      deck: 3,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-    Flashcard(
-      id: 14,
-      answerCorrect: true,
-      question: "What is the capital of Australia?",
-      answer: "Canberra",
-      interval: 5,
-      deck: 1,
-      answerTime: 10,
-      cardFavorite: true,
-    ),
-    Flashcard(
-      id: 15,
-      answerCorrect: false,
-      question: "Who wrote the novel 'To Kill a Mockingbird'?",
-      answer: "Harper Lee",
-      interval: 5,
-      deck: 2,
-      answerTime: 12,
-      cardFavorite: false,
-    ),
-  ];
-   
+    initNewDeck(userId);
+
+    void saveNewDeck() {
+      patchDeckDB(newDeck.id, textEditingController.text);
+    }
+
+  //   //currentCardList = [
+  //   Flashcard(
+  //     id: 1,
+  //     answerCorrect: true,
+  //     question: "What is the capital of France?",
+  //     answer: "Paris",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 10,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 2,
+  //     answerCorrect: true,
+  //     question: "What is the chemical symbol for gold?",
+  //     answer: "Au",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 15,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 3,
+  //     answerCorrect: false,
+  //     question: "Who wrote the novel 'Pride and Prejudice'?",
+  //     answer: "Jane Austen",
+  //     interval: 5,
+  //     deck: 2,
+  //     answerTime: 12,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 4,
+  //     answerCorrect: true,
+  //     question: "What is the capital of Japan?",
+  //     answer: "Tokyo",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 8,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 5,
+  //     answerCorrect: true,
+  //     question: "What is the largest planet in our solar system?",
+  //     answer: "Jupiter",
+  //     interval: 5,
+  //     deck: 3,
+  //     answerTime: 10,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 6,
+  //     answerCorrect: false,
+  //     question: "What is the chemical symbol for iron?",
+  //     answer: "Fe",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 12,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 7,
+  //     answerCorrect: true,
+  //     question: "Who painted the Mona Lisa?",
+  //     answer: "Leonardo da Vinci",
+  //     interval: 5,
+  //     deck: 4,
+  //     answerTime: 15,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 8,
+  //     answerCorrect: false,
+  //     question: "What is the largest ocean in the world?",
+  //     answer: "Pacific Ocean",
+  //     interval: 5,
+  //     deck: 3,
+  //     answerTime: 10,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 9,
+  //     answerCorrect: true,
+  //     question: "What is the capital of Brazil?",
+  //     answer: "Brasília",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 12,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 10,
+  //     answerCorrect: true,
+  //     question: "Who wrote the play 'Romeo and Juliet'?",
+  //     answer: "William Shakespeare",
+  //     interval: 5,
+  //     deck: 2,
+  //     answerTime: 10,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 11,
+  //     answerCorrect: false,
+  //     question: "What is the chemical symbol for sodium?",
+  //     answer: "Na",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 8,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 12,
+  //     answerCorrect: true,
+  //     question: "Who painted the 'Starry Night'?",
+  //     answer: "Vincent van Gogh",
+  //     interval: 5,
+  //     deck: 4,
+  //     answerTime: 15,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 13,
+  //     answerCorrect: false,
+  //     question: "What is the largest continent in the world?",
+  //     answer: "Asia",
+  //     interval: 5,
+  //     deck: 3,
+  //     answerTime: 12,
+  //     cardFavorite: false,
+  //   ),
+  //   Flashcard(
+  //     id: 14,
+  //     answerCorrect: true,
+  //     question: "What is the capital of Australia?",
+  //     answer: "Canberra",
+  //     interval: 5,
+  //     deck: 1,
+  //     answerTime: 10,
+  //     cardFavorite: true,
+  //   ),
+  //   Flashcard(
+  //     id: 15,
+  //     answerCorrect: false,
+  //     question: "Who wrote the novel 'To Kill a Mockingbird'?",
+  //     answer: "Harper Lee",
+  //     interval: 5,
+  //     deck: 2,
+  //     answerTime: 12,
+  //     cardFavorite: false,
+  //   ),
+  // ];
+    // if (!isDeckInitialized) {
+    //   return Scaffold(
+    //     appBar: AppBar(
+    //       title: const Text("새로운 덱"),
+    //     ),
+    //     body: const Center(
+    //       child: CircularProgressIndicator(),
+    //     ),
+    //   );
+    // }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("새로운 덱"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
+            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+              content: Text("저장사항 삭제")
+            )); 
+            deleteDeckDB(newDeck.id); //새로 만든 덱 삭제
             Navigator.pop(context);
           },
         ),
@@ -212,6 +251,7 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
             icon: const Icon(Icons.check),
             onPressed: () {
               saveNewDeck();
+              Navigator.pop(context);
             },
           ),
           PopupMenuButton(
@@ -294,16 +334,15 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
   Widget flashcardItemBuilder(BuildContext context, int index) {
     final Flashcard flashcard = currentCardList[index];
 
-    void editCard(BuildContext context, int index) async {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text("editing card $index")
+    void editCard(BuildContext context, Flashcard card) async {
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+        content: Text("editing card")
       )); 
-      moveToEditCardScreen(context, index);
+      moveToEditCardScreen(context, card);
     }
 
-    void deleteCard(BuildContext context, int index) async {
+    void deleteCard() async {
       // TODO 삭제 취소하기 버튼
-
 
       final snackBar = SnackBar(
         content: Text("deleted card $index")
@@ -313,6 +352,8 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
       setState(() {
         currentCardList.removeAt(index);
       });
+
+      deleteCardDB(flashcard.id);
     }
 
     return Slidable(
@@ -325,7 +366,7 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  editCard(context, index);
+                  editCard(context, flashcard);
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -345,7 +386,7 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  deleteCard(context, index);
+                  deleteCard();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -365,7 +406,7 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
 
       child: GestureDetector(
         onTap: () {
-          moveToEditCardScreen(context, index);
+          editCard(context, flashcard);
         },
         child: Center(
           child: Container(
@@ -416,44 +457,28 @@ class _AddDeckScreenState extends State<AddDeckScreen> {
     );
   }
 
-  void saveNewDeck() {
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("덱을 만들었습니다"))); 
-    //createDeckDB(); // add the deck
-  }
-  
-  void moveToEditCardScreen(BuildContext context, int index) {
-    // Flashcard flashcard = currentCardList[index];
-
-    // print("move to home");
-
-    // Navigator.push(
-    //   context, 
-    //   MaterialPageRoute(
-    //     builder: (context) => EditCardScreen(flashcard: flashcard)
-    //   ),
-    // );
-  }
-
   void moveToAddCardPage(BuildContext context) async {
-    print("move to home");
+    print("move to add card");
 
-    final result = await Navigator.push(
+    Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => const AddCardScreen(
-          parentDeck: null, // TODO fix
+        builder: (context) => AddCardScreen(
+          newDeck: newDeck,
         )
       ),
     );
+  }
 
-    if (result != null) {
-      print(result.question);
+  void moveToEditCardScreen(BuildContext context, Flashcard card) {
+    print("move to edit card");
 
-      setState(() {
-        currentCardList.add(result);
-      });
-      
-    }
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => EditCardScreen(flashcard: card)
+      ),
+    );
   }
 
 }
