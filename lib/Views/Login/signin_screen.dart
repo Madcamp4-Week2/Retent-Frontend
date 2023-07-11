@@ -194,10 +194,11 @@ class _SignInScreenState extends State<SignInScreen> {
 
   void signInWithKakao() async {
     try {
+      print("test1");
       final loginState = Provider.of<LoginState>(context, listen: false);
-
+      print("test1");
       bool isInstalled = await isKakaoTalkInstalled();
-
+      print("test1");
       OAuthToken token = isInstalled
           ? await UserApi.instance.loginWithKakaoTalk() // 설치되었으면 카카오톡으로 로그인
           : await UserApi.instance.loginWithKakaoAccount(); // 설치 안되었으면 계정으로 로그인
@@ -211,7 +212,7 @@ class _SignInScreenState extends State<SignInScreen> {
           HttpHeaders.authorizationHeader: 'Bearer ${token.accessToken}'
         },
       );
-
+      print("test2");
       final profileInfo =
           json.decode(response.body); // 로그인 후 프로필 정보를 response에서 받음
 
@@ -222,7 +223,7 @@ class _SignInScreenState extends State<SignInScreen> {
         // 카카오톡으로 로그인했음으로 저장
         _loginPlatform = LoginPlatform.kakao;
       });
-
+      print("test3");
       signKakao(token.accessToken);
     } catch (error) {
       print('카카오톡으로 로그인 실패 $error');
