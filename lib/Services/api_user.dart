@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/Services/base_client.dart';
+import 'package:test_project/auth_provider.dart';
 
 void signinUserDB(
     String nickname, String email, String password1, String password2) async {
@@ -21,10 +22,13 @@ void signinUserDB(
 
 void signKakao(String token) async {
   var response =
-      await BaseClient().post('/retent/kakao-login/', {"kakao_token": token});
-  if (response.statusCode == 200) {
-    print('Server login successful.');
+      await BaseClient().post('/kakao-login/', {"kakao_token": token});
+  if (response != null) {
+    LoginState().updateToken(response);
+    var userId = await BaseClient().get('/user/');
+    LoginState().updateUserId(userId);
+    print('=========userId $userId ========');
   } else {
-    print('Server login failed. Response: ${response.body}');
+    print('Server login failed');
   }
 }
