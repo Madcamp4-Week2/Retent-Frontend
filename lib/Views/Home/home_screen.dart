@@ -6,9 +6,8 @@ import 'stats_screen.dart';
 import 'market_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  final int userId;
 
-  const HomeScreen({super.key, required this.userId});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() =>  _HomeScreenState();
@@ -29,9 +28,11 @@ class _HomeScreenState extends State<HomeScreen> {
 
     final email = loginState.email;
 
+    print(email);
+
     return Scaffold(
       appBar: AppBar(
-        title: Text('Retent $email'),
+        title: Text('Retent '),
       ),
       body: IndexedStack(
         index: _currentIndex,

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Views/Home/deck_list_screen.dart';
 import 'package:test_project/Views/Home/learn_finish_screen.dart';
 import 'package:test_project/Models/flashcard.dart';
@@ -8,9 +9,9 @@ import 'package:flip_card/flip_card.dart';
 import 'package:rxdart/rxdart.dart';
 
 class LearnDeckScreen extends StatefulWidget {
-  final int deckIndex;
+  final Deck deck;
 
-  const LearnDeckScreen({super.key, required this.deckIndex});
+  const LearnDeckScreen({super.key, required this.deck});
 
   @override
   State<LearnDeckScreen> createState() => _LearnDeckScreenState();

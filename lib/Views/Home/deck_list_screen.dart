@@ -1,9 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:provider/provider.dart';
 import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Services/base_client.dart';
+import 'package:test_project/Views/Add/add_deck_screen.dart';
 import 'package:test_project/Views/Home/deck_screen.dart';
 import 'package:test_project/Views/Home/learn_deck_screen.dart';
+import 'package:test_project/auth_provider.dart';
+
+Future<List<Deck>> getMyDecksDB(int userId) async {
+  var response = await BaseClient().get('/flash-card/decks/{$userId}/');
+  if (response == null) {
+    debugPrint("getMyDecks unsuccessful");
+    return List.empty();
+  }
+  return deckFromJson(response.body);
+}
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -12,51 +24,205 @@ class DeckListScreen extends StatefulWidget {
   State<DeckListScreen> createState() => _DeckListScreenState();
 }
 
-class _DeckListScreenState extends State<DeckListScreen> {
-  // final List<String> _decks = [
-  //   'Deck 1',
-  //   'Deck 2',
-  //   'Deck 3','Deck 1',
-  //   'Deck 2',
-  //   'Deck 3','Deck 1',
-  //   'Deck 2',
-  //   'Deck 3','Deck 1',
-  //   'Deck 2',
-  //   'Deck 3',
-  // ]; //dummy data
+class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProviderStateMixin {
 
-  final userId = 1;
+  List<Deck> myDeckList = [];
+  late int userId;
 
-  List<Deck>? myDecks;
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isExpanded = false;
 
   @override
   void initState() {
     super.initState();
-    
-    myDecks = getMyDecksDB() as List<Deck>?;
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
   }
 
-  Future<List<Deck>?> getMyDecksDB() async {
-    var response = await BaseClient().get('/flash-card/decks/{$userId}/');
-    if (response == null) {
-      debugPrint("getMyDecks unsuccessfull");
-      return List.empty();
-    }
-    return deckFromJson(response.body);
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+  }
+
+  void getMyDeck(userId) async {
+    myDeckList = await getMyDecksDB(userId);
   }
 
   @override
   Widget build(BuildContext context) {
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      userId = loginState.userId; // TODO
+    });
+
+    debugPrint("UserId is $userId!!!!!!!!!!!!!");
+
+    getMyDeck(userId);
+    print(myDeckList);
+
+    myDeckList = [
+      Deck(id: 1, deckName: "Deck 1", user: 1, deckFavorite: true),
+      Deck(id: 2, deckName: "Deck 2", user: 2, deckFavorite: false),
+      Deck(id: 3, deckName: "Deck 3", user: 1, deckFavorite: true),
+    ];
+
     return Scaffold(
-      body: ListView.builder(
-        itemCount: myDecks!.length,
+      body: myDeckList.isEmpty?
+        const Center(
+          child: Text(
+            '덱을 추가하세요',
+            style: TextStyle(
+              fontSize: 24.0,
+              color: Colors.grey,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ) :
+        ListView.builder(
+        itemCount: myDeckList.length,
         itemBuilder: deckItemBuilder
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (_isExpanded) buildCircularButton(Icons.camera_alt, () {
+            moveToAddDeckScreen(context);
+          }),
+          if (_isExpanded) const SizedBox(height: 16.0),
+          if (_isExpanded) buildCircularButton(Icons.photo_library, () {
+            moveToAddDeckScreen(context);
+          }),
+          if (_isExpanded) const SizedBox(height: 16.0),
+          FloatingActionButton(
+            child: Icon(_isExpanded ? Icons.close : Icons.add),
+            onPressed: _toggleExpanded,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildCircularButton(IconData icon, VoidCallback onPressed) {
+    return ScaleTransition(
+      scale: _animation,
+      child: FloatingActionButton(
+        child: Icon(icon),
+        onPressed: onPressed,
       ),
     );
   }
 
   Widget deckItemBuilder(BuildContext context, int index) {
-    final deck = myDecks![index];
+    final deck = myDeckList[index];
+
+    bool isBookmarked = deck.deckFavorite;
+
+    void shareDeck() async {
+      final snackBar = SnackBar(
+        content: Text("shared deck $index")
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+    }
+
+    void bookmarkDeckDB(int deckId) async {
+      var response = await BaseClient().patch('/flash-card/decks/{$deckId}/', {"deckFavorite" : true});
+      if (response == null) {
+        debugPrint("bookmarkDeck unsuccessfull");
+      }
+      return;
+    }
+
+    void unbookmarkDeckDB(int deckId) async {
+      var response = await BaseClient().patch('/flash-card/decks/{$deckId}/', {"deckFavorite" : false});
+      if (response == null) {
+        debugPrint("unbookmarkDeck unsuccessfull");
+      }
+      return;
+    }
+
+    void bookmarkDeck() async {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("bookmarked deck ${deck.deckName}")));
+      isBookmarked = true;
+      bookmarkDeckDB(deck.id);
+    }
+
+    void unbookmarkDeck() async {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("unbookmarked deck ${deck.deckName}")));
+      isBookmarked = false;
+      unbookmarkDeckDB(deck.id);
+    }
+
+    void deleteDeckDB(int deckId) async {
+      var response = await BaseClient().delete('/flash-card/decks/{$deckId}/');
+      if (response == null) {
+        debugPrint("deleteDeck unsuccessfull");
+      }
+      return;
+    }
+
+    void deleteDeck() async {
+      final confirmed = await showDialog(
+        context: context,
+        builder: (context) {
+          return Theme(
+            data: Theme.of(context).copyWith(
+              dialogTheme: DialogTheme(
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(8.0),
+                ),
+              ),
+            ), 
+            child: AlertDialog(
+              //title: Text('Delete Deck'),
+              contentPadding: const EdgeInsets.all(16.0),
+              content: const Text('덱을 정말 삭제하시겠습니까'),
+              actions: [
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(false); // Return false to indicate cancel
+                  },
+                  child: const Text('아니오'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context).pop(true); // Return true to indicate confirmation
+                  },
+                  child: const Text('예'),
+                ),
+              ],
+            )
+          );
+        },
+      );
+
+      if (confirmed == true) {
+        final snackBar = SnackBar(
+          content: Text("Deleted card $index"),
+        );
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+        setState(() {
+          myDeckList.removeAt(index);
+        });
+        deleteDeckDB(deck.id);
+      }
+    }
 
     return Slidable(
       key: Key(deck.deckName),
@@ -68,7 +234,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  shareDeck(context, index);
+                  shareDeck();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -88,15 +254,15 @@ class _DeckListScreenState extends State<DeckListScreen> {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  bookmarkDeck(context, index);
+                  isBookmarked? unbookmarkDeck: bookmarkDeck;
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(10),
                 ),
-                child: const Icon(
-                  Icons.bookmark_border,
+                child: Icon(
+                  isBookmarked? Icons.bookmark: Icons.bookmark_border,
                   color: Colors.black,
                   size: 25,
                 ),
@@ -108,7 +274,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  deleteDeck(context, index);
+                  deleteDeck();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -128,7 +294,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
 
       child: GestureDetector(
         onTap: () {
-          moveToDeckScreen(context, index);
+          moveToDeckScreen(context, deck);
         },
         child: Container(
           margin: const EdgeInsets.all(10),
@@ -145,7 +311,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   child: Container(
                     //width: double.infinity,
                     alignment: Alignment.centerLeft,
-                    margin: EdgeInsets.symmetric(horizontal: 20),
+                    margin: const EdgeInsets.symmetric(horizontal: 20),
                     child: Text(
                       deck.deckName,
                       style: const TextStyle(
@@ -160,7 +326,7 @@ class _DeckListScreenState extends State<DeckListScreen> {
                   alignment: Alignment.centerRight,
                   child: ElevatedButton(
                     onPressed: () {
-                      moveToLearnScreen(context, index);
+                      moveToLearnScreen(context, deck);
                     },
                     style: ElevatedButton.styleFrom(
                       shape: const CircleBorder(),
@@ -183,54 +349,39 @@ class _DeckListScreenState extends State<DeckListScreen> {
     );
   }
 
-  void shareDeck(BuildContext context, int index) async {
-    final snackBar = SnackBar(
-      content: Text("shared deck $index")
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
-  }
 
-  void bookmarkDeck(BuildContext context, int index) async {
-    final snackBar = SnackBar(
-      content: Text("bookmarked deck $index")
-    ); 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void deleteDeck(BuildContext context, int index) async {
-    final snackBar = SnackBar(
-      content: Text("deleted deck $index")
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
-
-    setState(() {
-      myDecks!.removeAt(index);
-    });
-  }
-
-  void moveToDeckScreen(BuildContext context, int index) {
+  void moveToDeckScreen(BuildContext context, Deck deck) {
     print("move to home");
 
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => DeckScreen(deckIndex: index)
+        builder: (context) => DeckScreen(deck : deck)
       ),
     );
   }
 
-  void moveToLearnScreen(BuildContext context, int index) {
+  void moveToLearnScreen(BuildContext context, Deck deck) {
     print("move to home");
 
     final snackBar = SnackBar(
-      content: Text("Learn deck $index")
+      content: Text("Learn deck ${deck.deckName}")
     );
     ScaffoldMessenger.of(context).showSnackBar(snackBar); 
 
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => LearnDeckScreen(deckIndex: index)
+        builder: (context) => LearnDeckScreen(deck: deck)
+      ),
+    );
+  }
+
+  void moveToAddDeckScreen(BuildContext context) {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => const AddDeckScreen()
       ),
     );
   }

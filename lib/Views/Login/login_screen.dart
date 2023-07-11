@@ -20,7 +20,8 @@ class LoginScreen extends StatefulWidget {
 class _LoginScreenState extends State<LoginScreen> {
   LoginPlatform _loginPlatform = LoginPlatform.none;
 
-  int? userId = null; 
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
 
   Widget build(BuildContext context) {
     return Scaffold(
@@ -35,6 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Consumer<LoginState>(
               builder: (context, loginState, _) {
                 return TextField(
+                  controller: _emailController,
                   onChanged: loginState.updateEmail,
                   decoration: const InputDecoration(
                     labelText: '이메일',
@@ -46,6 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
             Consumer<LoginState>(
               builder: (context, loginState, _) {
                 return TextField(
+                  controller: _passwordController,
                   onChanged: loginState.updatePassword,
                   decoration: const InputDecoration(
                     labelText: '비밀번호',
@@ -87,6 +90,12 @@ class _LoginScreenState extends State<LoginScreen> {
   void Login() async {
     final loginState = Provider.of<LoginState>(context, listen: false);
 
+    final email = _emailController.text;
+    final password = _passwordController.text;
+
+    loginState.updateEmail(email);
+    loginState.updatePassword(password);
+
     print("${loginState.email}");
 
     bool loginSuccess = await loginState.login();
@@ -124,9 +133,7 @@ class _LoginScreenState extends State<LoginScreen> {
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => HomeScreen(
-          userId: userId!,
-        )
+        builder: (context) => HomeScreen()
       ),
     );
   }

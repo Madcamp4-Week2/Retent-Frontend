@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 class LoginState extends ChangeNotifier {
   String email = '';
   String password = '';
+  int userId = 1;
 
   void updateEmail(String value) {
     email = value;
@@ -13,6 +14,10 @@ class LoginState extends ChangeNotifier {
   void updatePassword(String value) {
     password = value;
     notifyListeners();
+  }
+
+  void updateUserId() {
+    //api로 현재 email, password 정보 보내고 id 받아옴
   }
 
   Future<bool> login() async {

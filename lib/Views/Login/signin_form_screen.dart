@@ -28,15 +28,10 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
       final email = _emailController.text;
       final nickname = _nicknameController.text;
       final password = _passwordController.text;
-
-      User newUser  = User(
-        emailAddress: email,
-        nickname: nickname,
-        password: password, 
-      );
+      final confirmPassword = _confirmPasswordController.text;
 
       // Perform your sign-in logic here
-      addUserDB(newUser);
+      signinUserDB(nickname, email, password, confirmPassword);
 
       // Clear the form
       _emailController.clear();
@@ -53,20 +48,24 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
     }
   }
 
-  void addUserDB(User user) async {
-    var response = await BaseClient().post('users/', user);
+  void signinUserDB(String nickname, String email, String password1, String password2) async {
+    var response = await BaseClient().post(
+      'dj-rest-auth/registration/', 
+      {"email" : email, "password1" : password1, "password2" : password2, "nickname" : nickname},
+    );
     if (response == null) {
       debugPrint("failed post User");
       return;
     }
     debugPrint("successful post User"); 
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Sign In'),
+        title: Text('회원가입'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -77,12 +76,12 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
             children: [
               TextFormField(
                 controller: _emailController,
-                decoration: InputDecoration(
-                  labelText: 'Email',
+                decoration: const InputDecoration(
+                  labelText: '이메일',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your email';
+                    return '이메일을 입력하세요';
                   }
                   return null;
                 },
@@ -91,11 +90,11 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
               TextFormField(
                 controller: _nicknameController,
                 decoration: InputDecoration(
-                  labelText: 'Nickname',
+                  labelText: '닉네임',
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter your nickname';
+                    return '닉네임을 입력하세요';
                   }
                   return null;
                 },
@@ -103,13 +102,13 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
               SizedBox(height: 24.0),
               TextFormField(
                 controller: _passwordController,
-                decoration: InputDecoration(
-                  labelText: 'Password',
+                decoration: const InputDecoration(
+                  labelText: '비밀번호',
                 ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a password';
+                    return '비밀번호를 입력하세요';
                   }
                   return null;
                 },
@@ -117,13 +116,13 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
               SizedBox(height: 24.0),
               TextFormField(
                 controller: _confirmPasswordController,
-                decoration: InputDecoration(
-                  labelText: 'Confirm Password',
+                decoration: const InputDecoration(
+                  labelText: '비밀번호 확인',
                 ),
                 obscureText: true,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please confirm your password';
+                    return '비밀번호 확인';
                   }
                   if (value != _passwordController.text) {
                     return 'Passwords do not match';

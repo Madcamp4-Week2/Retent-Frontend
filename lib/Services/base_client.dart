@@ -44,6 +44,18 @@ class BaseClient {
     }
   }
 
+  Future<dynamic> patch(String api, dynamic object) async {
+    var uri = Uri.parse(baseUrl + api); //fill uri
+    var _payload = json.encode(object);
+
+    var response = await client.patch(uri, body: _payload);
+    if (response.statusCode == 200) {
+      return response.body;
+    } else {
+      
+    }
+  }
+
   Future<dynamic> delete(String api) async {
     var uri = Uri.parse(baseUrl + api); //fill uri
 

@@ -1,38 +1,51 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:test_project/Models/deck.dart';
-import 'package:test_project/Services/api_calls.dart';
 import 'package:test_project/Services/base_client.dart';
+import 'package:test_project/Views/Add/add_card_screen.dart';
 import 'package:test_project/Views/Home/edit_card_screen.dart';
 
 import 'package:test_project/Models/flashcard.dart';
 
 
-class DeckScreen extends StatefulWidget {
-  final Deck deck;
-  
-  const DeckScreen({super.key, required this.deck});
+class AddDeckScreen extends StatefulWidget {
+  const AddDeckScreen({super.key});
 
   @override
-  State<DeckScreen> createState() => _DeckScreenState();
+  State<AddDeckScreen> createState() => _AddDeckScreenState();
 }
 
-class _DeckScreenState extends State<DeckScreen> {
-  List<Flashcard> cardList = [];
+class _AddDeckScreenState extends State<AddDeckScreen> {
+  List<Flashcard> currentCardList = [];
+
+  final TextEditingController textEditingController = TextEditingController();
+
+  // void addNewDeckDB(Deck newDeck) async {
+  //   var response = await BaseClient().post('/flash-card/decks', newDeck);
+  //   if (response == null) {
+  //     debugPrint("addNewDeck unsuccessful");
+  //   }
+  // }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    
+  }
+
+  // void addNewDeck() {
+  //   Deck
+
+  //   newDeck = Deck(deckName: deckName, user: user)
+
+  //   addNewDeckDB(newDeck);
+  // }
   
   @override
   Widget build(BuildContext context) {
-    Deck deck = widget.deck;
 
-    //flashcardDeck = getMyCardsDB(deck.deckId) as List<Flashcard>;
-
-    void getMyCards(deckId) async {
-      cardList = await getMyCardsDB(deckId);
-    }
-
-    getMyCards(deck.id);
-
-    cardList = [
+    currentCardList = [
     Flashcard(
       id: 1,
       answerCorrect: true,
@@ -185,10 +198,9 @@ class _DeckScreenState extends State<DeckScreen> {
     ),
   ];
    
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(deck.deckName),
+        title: const Text("새로운 덱"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () {
@@ -197,28 +209,25 @@ class _DeckScreenState extends State<DeckScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.share),
+            icon: const Icon(Icons.check),
             onPressed: () {
-              final snackBar = SnackBar(
-                content: Text("${deck.deckName}를 공유했습니다") //TODO
-              );
-              ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+              saveNewDeck();
             },
           ),
           PopupMenuButton(
             itemBuilder: (BuildContext context) {
               return const [
                 PopupMenuItem(
-                  child: Text('Option 1'),
                   value: 'Option 1',
+                  child: Text('Option 1'),
                 ),
                 PopupMenuItem(
-                  child: Text('Option 2'),
                   value: 'Option 2',
+                  child: Text('Option 2'),
                 ),
                 PopupMenuItem(
-                  child: Text('Option 3'),
                   value: 'Option 3',
+                  child: Text('Option 3'),
                 ),
               ];
             },
@@ -229,24 +238,31 @@ class _DeckScreenState extends State<DeckScreen> {
           ),
         ],
       ),
-      
       body: Container(
         //padding: const EdgeInsets.only(top: 20, left: 20, right: 0), //slidables을 위한 공간을 위해 0으로
         child: Column(
           children: [
-            Padding(
+            Container(
+              height: 100,
               padding: const EdgeInsets.all(16.0),
               child: Row(
                 children: [
-                  Text(
-                  '${deck.deckName} 의 정보', // Centered text
-                  style: const TextStyle(
-                    color: Colors.black, // Text color
-                    fontSize: 16.0, // Text size
-                    fontFamily: 'Pretendard', // Custom font family
-                    fontWeight: FontWeight.bold),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: TextFormField(
+                        controller: textEditingController,
+                        style: const TextStyle(
+                          color: Colors.black, // Text color
+                          fontSize: 16.0, // Text size
+                          fontFamily: 'Pretendard', // Custom font family
+                          fontWeight: FontWeight.bold),
+                        decoration: const InputDecoration(
+                          hintText: '덱의 이름을 입력하세요'
+                        ),
+                      ),
+                    ),
                   ),
-                  Spacer(),
                   IconButton(
                     onPressed: () {
                       const snackBar = SnackBar(
@@ -260,17 +276,44 @@ class _DeckScreenState extends State<DeckScreen> {
             ),
             Expanded(
               child: ListView.builder(
-                itemCount: cardList.length,
+                itemCount: currentCardList.length,
                 itemBuilder: flashcardItemBuilder),
             )
           ]
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          moveToAddCardPage(context);
+        }
+      ),
     );
   }
 
   Widget flashcardItemBuilder(BuildContext context, int index) {
-    final Flashcard flashcard = cardList[index];
+    final Flashcard flashcard = currentCardList[index];
+
+    void editCard(BuildContext context, int index) async {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text("editing card $index")
+      )); 
+      moveToEditCardScreen(context, index);
+    }
+
+    void deleteCard(BuildContext context, int index) async {
+      // TODO 삭제 취소하기 버튼
+
+
+      final snackBar = SnackBar(
+        content: Text("deleted card $index")
+      );
+      ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+
+      setState(() {
+        currentCardList.removeAt(index);
+      });
+    }
 
     return Slidable(
       key: Key(flashcard.id.toString()),
@@ -285,7 +328,7 @@ class _DeckScreenState extends State<DeckScreen> {
                   editCard(context, index);
                 },
                 style: ElevatedButton.styleFrom(
-                  shape: CircleBorder(),
+                  shape: const CircleBorder(),
                   backgroundColor: Colors.white,
                   padding: const EdgeInsets.all(10),
                 ),
@@ -334,7 +377,7 @@ class _DeckScreenState extends State<DeckScreen> {
                 borderRadius: BorderRadius.circular(12.0),
               ),
               child: Container(
-                margin: EdgeInsets.all(20),
+                margin: const EdgeInsets.all(20),
                 width: double.infinity,
                 alignment: Alignment.center,
                 child: Column(
@@ -370,50 +413,48 @@ class _DeckScreenState extends State<DeckScreen> {
           ),
         ),
       )
-
     );
   }
 
-  void editCard(BuildContext context, int index) async {
-    final snackBar = SnackBar(
-      content: Text("editing card $index")
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
-    moveToEditCardScreen(context, index);
+  void saveNewDeck() {
+    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("덱을 만들었습니다"))); 
+    //createDeckDB(); // add the deck
   }
-
-  void bookmarkCard(BuildContext context, int index) async {
-    final snackBar = SnackBar(
-      content: Text("bookmarked deck $index")
-    ); 
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
-  }
-
-  void deleteCard(BuildContext context, int index) async {
-    // TODO 삭제 취소하기 버튼
-
-
-    final snackBar = SnackBar(
-      content: Text("deleted card $index")
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
-
-    setState(() {
-      cardList.removeAt(index);
-    });
-  }
-
+  
   void moveToEditCardScreen(BuildContext context, int index) {
-    Flashcard flashcard = cardList[index];
+    // Flashcard flashcard = currentCardList[index];
 
+    // print("move to home");
+
+    // Navigator.push(
+    //   context, 
+    //   MaterialPageRoute(
+    //     builder: (context) => EditCardScreen(flashcard: flashcard)
+    //   ),
+    // );
+  }
+
+  void moveToAddCardPage(BuildContext context) async {
     print("move to home");
 
-    Navigator.push(
+    final result = await Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => EditCardScreen(flashcard: flashcard)
+        builder: (context) => const AddCardScreen(
+          parentDeck: null, // TODO fix
+        )
       ),
     );
+
+    if (result != null) {
+      print(result.question);
+
+      setState(() {
+        currentCardList.add(result);
+      });
+      
+    }
   }
+
 }
 

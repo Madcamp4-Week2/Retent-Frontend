@@ -186,6 +186,8 @@ class _SignInScreenState extends State<SignInScreen> {
         },
       );
 
+      print(token.accessToken.toString());
+
       final profileInfo = json.decode(response.body); // 로그인 후 프로필 정보를 response에서 받음
       print(profileInfo.toString());
 
