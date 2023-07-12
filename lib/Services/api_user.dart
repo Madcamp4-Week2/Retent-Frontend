@@ -1,6 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/Services/base_client.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert'; // for json
 import 'package:test_project/auth_provider.dart';
+
+void loginUser(String email, String password) async {
+  const String baseUrl = 'your_base_url_here';
+
+  final response = await BaseClient().post(
+    "dj-rest-auth/login/",
+    {
+      'email': email,
+      'password': password,
+    },
+  );
+
+  if (response != null) {
+    LoginState().updateToken(response);
+    var userId = await BaseClient().get('/user/');
+    LoginState().updateUserId(userId);
+    print('=========userId $userId ========');
+  } else {
+    throw Exception('Failed to log in');
+  }
+}
 
 void signinUserDB(
     String nickname, String email, String password1, String password2) async {
@@ -17,7 +40,7 @@ void signinUserDB(
     debugPrint("failed post User");
     return;
   }
-  debugPrint("successful post User");
+  throw Exception("successful post User");
 }
 
 void signKakao(String token) async {
@@ -29,6 +52,6 @@ void signKakao(String token) async {
     LoginState().updateUserId(userId);
     print('=========userId $userId ========');
   } else {
-    print('Server login failed');
+    throw Exception('Server login failed');
   }
 }
