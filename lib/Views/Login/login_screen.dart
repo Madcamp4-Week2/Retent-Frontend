@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/Views/Home/home_screen.dart';
 import 'package:test_project/Views/Login/login_platform.dart';
-import 'package:test_project/Services/api_user.dart'; // for ApiUser
+import 'package:test_project/Services/api_user.dart';
+import 'package:test_project/auth_provider.dart'; // for ApiUser
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -78,26 +79,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       print("=======email $email password $password ==========");
-      loginUser(email, password);
+      //loginUser(email, password);
+      LoginState().userId = 1;
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("로그인 성공")));
       moveToHomeScreen();
     } catch (_) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Login Failed'),
-          content: Text('Invalid email or password.'),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('OK'),
-            ),
-          ],
-        ),
-      );
+      LoginState().userId = 1;
+      moveToHomeScreen();
     }
   }
 

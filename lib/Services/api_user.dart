@@ -6,6 +6,7 @@ import 'package:test_project/auth_provider.dart';
 import 'dart:io';
 
 void loginUser(String email, String password) async {
+  print('================================');
   var response = await BaseClient().post(
     "/dj-rest-auth/login/",
     {"email": email, "password": password},
@@ -75,7 +76,7 @@ Future<int> signinUser(
       "nickname": nickname
     },
   );
-
+  print('================================');
   if (response != null) {
     Map<String, dynamic> responseData = jsonDecode(response);
     int pk = responseData['user']['pk'];
