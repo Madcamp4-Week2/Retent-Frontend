@@ -11,8 +11,30 @@ void postHistoryDB(int deckId, double totalTime, double accuracy) async {
     {"deck" : deckId, "accurcacy" : accuracy, "deckAnswerTime" : totalTime}
   );
   if (responseBody == null) {
-    debugPrint("postDeck unsuccessful");
+    debugPrint("--------postHistory unsuccessful--------");
   }
   return; // DeckId를 반환
+}
+
+Future<List<History>?> getFullHistoryDB() async {
+  var responseBody = await BaseClient().get(
+    '/flash-card/deck-history/'
+  );
+  if (responseBody == null) {
+    debugPrint("--------postDeck unsuccessful--------");
+    return null;
+  }
+  return historyFromJson(responseBody);
+}
+
+Future<List<History>?> getDeckHistoryDB(int deckId) async {
+  var responseBody = await BaseClient().get(
+    '/flash-card/deck-history/$deckId'
+  );
+  if (responseBody == null) {
+    debugPrint("postDeck unsuccessful");
+    return null;
+  }
+  return historyFromJson(responseBody);
 }
 

@@ -20,11 +20,7 @@ void signinUserDB(
 }
 
 void signKakao(String token) async {
+  print('========token======== $token');
   var response =
-      await BaseClient().post('/retent/kakao-login/', {"kakao_token": token});
-  if (response.statusCode == 200) {
-    print('Server login successful.');
-  } else {
-    print('Server login failed. Response: ${response.body}');
-  }
+      await BaseClient().post('/kakao-login/', {"kakao_token": token});
 }

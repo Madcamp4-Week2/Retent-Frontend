@@ -4,7 +4,7 @@ import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Models/tag.dart';
 import 'package:test_project/Services/api_card.dart';
 import 'package:test_project/Services/api_deck.dart';
-import 'package:test_project/Views/Home/deck_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/deck_screen.dart';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -21,7 +21,7 @@ class AddCardScreen extends StatefulWidget {
 }
 
 class _AddCardScreenState extends State<AddCardScreen> {
-  int? selectedDeckId;
+  int? selectedDeck;
   late int userId;
 
   List<Tag> myTagList = [];
@@ -32,6 +32,17 @@ class _AddCardScreenState extends State<AddCardScreen> {
   final TextEditingController answerEditingController = TextEditingController();
 
   @override
+  void initState() {
+    super.initState();
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      userId = loginState.userId;
+      myDeckList = loginState.myDeckList;
+      selectedDeck = widget.newDeck.id;
+    });
+  }
+
+  @override
   void dispose() {
     textEditingController.dispose();
     questionEditingController.dispose();
@@ -39,18 +50,13 @@ class _AddCardScreenState extends State<AddCardScreen> {
     super.dispose();
   }
 
-  void getMyDeck(userId) async {
-    myDeckList = await getMyDecksDB(userId);
-    setState(() {});
-  }
+  // void getMyDeck(userId) async {
+  //   myDeckList = await getMyDecksDB(userId);
+  //   setState(() {});
+  // }
 
   @override
   Widget build(BuildContext context) {
-    final loginState = Provider.of<LoginState>(context, listen: false);
-    setState(() {
-      userId = loginState.userId; // TODO
-      getMyDeck(userId);
-    });
 
     return Scaffold(
       appBar: AppBar(
@@ -80,19 +86,15 @@ class _AddCardScreenState extends State<AddCardScreen> {
               child: DropdownButtonHideUnderline(
                 child: DropdownButton2(
                   hint: const Text('덱을 고르세요  '),
-                  value: selectedDeckId,
+                  value: selectedDeck,
                   items: myDeckList.map((Deck item) => DropdownMenuItem(
                     value: item.id,
                     child: Text(item.deckName))
                     ).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedDeckId = value as int?;
+                      selectedDeck = value as int?;
                     });
-                    final snackBar = SnackBar(
-                      content: Text("덱을 $selectedDeckId로 바꿨습니다")
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
                   },
                   iconStyleData: const IconStyleData(
                     icon: Icon(Icons.expand_circle_down)
@@ -211,12 +213,12 @@ class _AddCardScreenState extends State<AddCardScreen> {
     final newAnswer = answerEditingController.text;
     
     // TODO db로 현재 상태를 보냄 - patch
-    if(selectedDeckId == null) {
+    if(selectedDeck == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
         content: Text("덱 안고름")
       )); 
     } else {
-      postCardDB(widget.newDeck.id, newQuestion, newAnswer);
+      postCardDB(selectedDeck!, newQuestion, newAnswer);
 
       Navigator.pop(context);
     }

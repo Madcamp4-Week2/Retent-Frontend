@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Models/tag.dart';
+import 'package:test_project/Services/api_card.dart';
 import 'package:test_project/Services/api_deck.dart';
+import 'package:test_project/Services/api_tags.dart';
 import 'package:test_project/Services/base_client.dart';
-import 'package:test_project/Views/Home/deck_list_screen.dart';
-import 'package:test_project/Views/Home/deck_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/deck_screen.dart';
 
 import 'package:dropdown_button2/dropdown_button2.dart';
 
@@ -24,9 +25,7 @@ class EditCardScreen extends StatefulWidget {
 class _EditCardScreenState extends State<EditCardScreen> {
   late int userId;
   bool isBookmarked = false;
-  Deck? selectedDeck;
-
-  
+  int? selectedDeck;
 
 //   Future<List<Deck>> getMyDecksDB(int userId) async {
 //   var response = await BaseClient().get('/flash-card/decks/{$userId}/');
@@ -37,8 +36,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
 //   return deckFromJson(response.body);
 // }
 
-  List<Tag> myTagList = [];
-  List<Deck> myDeckList = []; // TODO db써서 가져오기
+  late List<Deck> myDeckList = [];
 
   final TextEditingController textEditingController = TextEditingController();
   final TextEditingController questionEditingController = TextEditingController();
@@ -51,31 +49,27 @@ class _EditCardScreenState extends State<EditCardScreen> {
     answerEditingController.dispose();
     super.dispose();
   }
-  
-  // void getMyTags(userId) async {
-  //   myTagList = await getMyTagsDB(userId);
-  // }
 
-  // void getMyDecks(userId) async {
-  //   myDeckList = await getMyDecksDB(userId);
-  // }
+  @override
+  void initState() {
+    super.initState();
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      selectedDeck = widget.flashcard.deck;
+      userId = loginState.userId;
+      //getMyDecks(userId);
+      myDeckList = loginState.myDeckList;
+    });
+  }
+
+  void getMyDecks(userId) async {
+    myDeckList = await getMyDecksDB(userId);
+  }
 
   @override
   Widget build(BuildContext context) {
-    final loginState = Provider.of<LoginState>(context, listen: false);
-    setState(() {
-      userId = loginState.userId; // TODO
-      //selectedDeck = widget.flashcard.deck; //need to deck get(deckid)
-    });
-
-    // getMyTags(userId);
-    // getMyDecks(userId);
-
-    myDeckList = [ // dummy data
-      Deck(id: 1, deckName: "Deck 1", user: 1, deckFavorite: true),
-      Deck(id: 2, deckName: "Deck 2", user: 2, deckFavorite: false),
-      Deck(id: 3, deckName: "Deck 3", user: 1, deckFavorite: true),
-    ];
+    questionEditingController.text = widget.flashcard.question;
+    answerEditingController.text = widget.flashcard.answer;
 
     return Scaffold(
       appBar: AppBar(
@@ -84,6 +78,8 @@ class _EditCardScreenState extends State<EditCardScreen> {
             icon: const Icon(Icons.check),
             onPressed: () {
               saveEditedCard(); // 지금 변경사항을 저장
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("변경사항을 저장했습니다")
+    ));
             },
           ),
           IconButton(
@@ -93,7 +89,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
             },
           ),
         ],
-        title: const Text('카드 만들기'), 
+        title: const Text('카드 수정하기'), 
       ),
       body: Container(
         margin: const EdgeInsets.all(20),
@@ -107,17 +103,14 @@ class _EditCardScreenState extends State<EditCardScreen> {
                   hint: const Text('덱을 고르세요  '),
                   value: selectedDeck,
                   items: myDeckList.map((Deck item) => DropdownMenuItem(
-                    value: item,
+                    value: item.id,
                     child: Text(item.deckName))
                     ).toList(),
                   onChanged: (value) {
                     setState(() {
-                      selectedDeck = value as Deck?;
-                    });
-                    final snackBar = SnackBar(
-                      content: Text("덱을 $selectedDeck로 바꿨습니다")
-                    );
-                    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+                      selectedDeck = value as int?;
+                      print("----------selected value is $selectedDeck---------");
+                    }); 
                   },
                   iconStyleData: const IconStyleData(
                     icon: Icon(Icons.expand_circle_down)
@@ -184,7 +177,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
                     children: [
                       TextFormField(
                         controller: questionEditingController,
-                        initialValue: widget.flashcard.question,
+                        //initialValue: widget.flashcard.question,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
@@ -204,7 +197,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
                       const SizedBox(height: 20,),
                       TextFormField(
                         controller: answerEditingController,
-                        initialValue: widget.flashcard.answer,
+                        //initialValue: widget.flashcard.answer,
                         style: const TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
@@ -233,10 +226,6 @@ class _EditCardScreenState extends State<EditCardScreen> {
     );
   }
 
-  void saveEditedCardDB(Flashcard newCard) {
-
-  }
-
   void saveEditedCard() async {
     final newQuestion = questionEditingController.text;
     final newAnswer = answerEditingController.text;
@@ -248,14 +237,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
         content: Text("덱 안고름")
       )); 
     } else {
-      final newCard = Flashcard(
-        id: widget.flashcard.id, // TODO FIX!!!!!!
-        question: newQuestion, 
-        answer: newAnswer,
-        deck: newDeck.id
-      );
-
-      saveEditedCardDB(newCard);
+      patchCardDB(newDeck, newQuestion, newAnswer);
     }
   }
 }

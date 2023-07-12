@@ -5,9 +5,10 @@ import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Services/api_deck.dart';
 import 'package:test_project/Services/base_client.dart';
 import 'package:test_project/Views/Add/add_deck_screen.dart';
-import 'package:test_project/Views/Home/deck_screen.dart';
-import 'package:test_project/Views/Home/learn_deck_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/deck_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/learn_deck_screen.dart';
 import 'package:test_project/auth_provider.dart';
+import 'package:textfield_tags/textfield_tags.dart';
 
 class DeckListScreen extends StatefulWidget {
   const DeckListScreen({super.key});
@@ -19,11 +20,15 @@ class DeckListScreen extends StatefulWidget {
 class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProviderStateMixin {
 
   List<Deck> myDeckList = [];
+  List<Deck> shownDeckList = [];
   late int userId;
 
   late AnimationController _animationController;
   late Animation<double> _animation;
   bool _isExpanded = false;
+
+  TextEditingController deckSearchController = TextEditingController();
+  TextfieldTagsController tagsController = TextfieldTagsController();
 
   @override
   void initState() {
@@ -33,6 +38,14 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+  
+    final loginState = Provider.of<LoginState>(context, listen: false);
+    setState(() {
+      userId = loginState.userId;
+    });
+    getMyDeck(userId);
+    loginState.updateDeckList(); //다른개에서도 업대이트하기
+    shownDeckList = myDeckList;
   }
 
   @override
@@ -52,21 +65,13 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     });
   }
 
-  // void getMyDeck(userId) async {
-  //   myDeckList = await getMyDecksDB(userId);
-  //   setState(() {});
-  // }
+  void getMyDeck(userId) async {
+    myDeckList = await getMyDecksDB(userId);
+    setState(() {});
+  }
 
   @override
   Widget build(BuildContext context) {
-    final loginState = Provider.of<LoginState>(context, listen: false);
-    setState(() {
-      userId = loginState.userId; // TODO
-      getMyDecksDB(userId).then((decks) {
-        myDeckList = decks;
-      });
-    });
-
     debugPrint("UserId is $userId!!!!!!!!!!!!!");
     
     print("the total list is $myDeckList");
@@ -82,11 +87,18 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
               fontWeight: FontWeight.bold,
             ),
           ),
-        ) :
-        ListView.builder(
-        itemCount: myDeckList.length,
-        itemBuilder: deckItemBuilder
-      ),
+        ):
+        Column(
+          children: [
+            deckSearchBar(),
+            Expanded(
+              child: ListView.builder(
+              itemCount: shownDeckList.length,
+              itemBuilder: deckItemBuilder
+                  ),
+            ),
+          ],
+        ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -107,6 +119,130 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     );
   }
 
+  Widget deckSearchBar() {
+    return Container(
+      padding: EdgeInsets.all(16),
+      child: Column(
+        children: [
+          TextFieldTags(
+            textfieldTagsController: tagsController,
+            initialTags: [],
+            textSeparators: const [' ', ','],
+            letterCase: LetterCase.normal,
+            validator: (String tag) {
+              if (tag == 'taboo') {
+                return 'nope';
+              } else if (tagsController.getTags!.contains(tag)) {
+                return '이미 사용하셨습니다';
+              }
+            },
+            inputfieldBuilder:
+              (context, tec, fn, error, onChanged, onSubmitted) {
+            return ((context, sc, tags, onTagDelete) {
+              double _distanceToField;
+              return Padding(
+                padding: const EdgeInsets.all(10.0),
+                child: TextField(
+                  controller: tec,
+                  focusNode: fn,
+                  decoration: InputDecoration(
+                    isDense: true,
+                    border: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 74, 137, 92),
+                        width: 3.0,
+                      ),
+                    ),
+                    focusedBorder: const OutlineInputBorder(
+                      borderSide: BorderSide(
+                        color: Color.fromARGB(255, 74, 137, 92),
+                        width: 3.0,
+                      ),
+                    ),
+                    helperText: '태그를 입력하세요',
+                    helperStyle: const TextStyle(
+                      color: Color.fromARGB(255, 74, 137, 92),
+                    ),
+                    //hintText: tagsController.hasTags ? '' : "태그를 입력하세요",
+                    errorText: error,
+                    prefixIconConstraints:
+                        BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.74),
+                    prefixIcon: tags.isNotEmpty
+                        ? SingleChildScrollView(
+                            controller: sc,
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                                children: tags.map((String tag) {
+                              return Container(
+                                decoration: const BoxDecoration(
+                                  borderRadius: BorderRadius.all(
+                                    Radius.circular(20.0),
+                                  ),
+                                  color: Color.fromARGB(255, 74, 137, 92),
+                                ),
+                                margin: const EdgeInsets.symmetric(
+                                    horizontal: 5.0),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 10.0, vertical: 5.0),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    InkWell(
+                                      child: Text(
+                                        '#$tag',
+                                        style: const TextStyle(color: Colors.white),
+                                      ),
+                                      onTap: () {
+                                        print("$tag 선택");
+                                      },
+                                    ),
+                                    const SizedBox(width: 4.0),
+                                    InkWell(
+                                      child: const Icon(
+                                        Icons.cancel,
+                                        size: 14.0,
+                                        color: Colors.grey,
+                                      ),
+                                      onTap: () {
+                                        onTagDelete(tag);
+                                      },
+                                    )
+                                  ],
+                                ),
+                              );
+                            }).toList()),
+                          )
+                        : null,
+                  ),
+                  onChanged: onChanged,
+                  onSubmitted: onSubmitted,
+                ),
+              );
+            });
+                  },
+                ),
+        ElevatedButton(
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+          ),
+          onPressed: () {
+            tagsController.clearTags();
+          },
+          child: const Text('태그 지우기'),
+        )
+        ],
+      ),
+    );
+  }
+
+  void filterSearchResults(String query) {
+    setState(() {
+      shownDeckList = myDeckList
+        .where((item) => item.deckName.toLowerCase().contains(query.toLowerCase()))
+        .toList();
+    });
+  }
+
   Widget buildCircularButton(IconData icon, VoidCallback onPressed) {
     return ScaleTransition(
       scale: _animation,
@@ -118,7 +254,7 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
   }
 
   Widget deckItemBuilder(BuildContext context, int index) {
-    final deck = myDeckList[index];
+    final deck = shownDeckList[index];
 
     bool isBookmarked = deck.deckFavorite;
 
@@ -184,13 +320,14 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
 
         setState(() {
           myDeckList.removeAt(index);
+          shownDeckList.removeAt(index);
         });
         deleteDeckDB(deck.id);
       }
     }
 
     return Slidable(
-      key: Key(deck.deckName),
+      key: Key(deck.id.toString()),
       endActionPane: ActionPane(
         motion: const ScrollMotion(),
         children: [
@@ -321,7 +458,7 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => DeckScreen(deck : deck)
+        builder: (context) => DeckScreen(curDeck : deck)
       ),
     );
   }

@@ -40,10 +40,10 @@ Future<Deck?> getDeckDB(int deckId) async {
 // }
 
 Future<Deck?> postDeckDB(String deckName, int userId) async {
+  print(json.encode({"deckName" : deckName, "user" : userId}));
   var responseBody = await BaseClient().post(
     '/flash-card/decks/',
     {"deckName" : deckName, "user" : userId}, // Here, convert the map to a JSON string
-    // Set the content-type header
   );
   if (responseBody == null) {
     debugPrint("postDeck unsuccessful");

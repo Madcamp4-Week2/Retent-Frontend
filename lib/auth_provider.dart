@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:test_project/Models/deck.dart';
+import 'package:test_project/Services/api_deck.dart';
 
 class LoginState extends ChangeNotifier {
   String email = '';
   String password = '';
   int userId = 1;
+
+  List<Deck> myDeckList = [];
 
   void updateEmail(String value) {
     email = value;
@@ -18,6 +22,13 @@ class LoginState extends ChangeNotifier {
 
   void updateUserId() {
     //api로 현재 email, password 정보 보내고 id 받아옴
+  }
+
+  void updateDeckList() async {
+    myDeckList = await getMyDecksDB(userId);
+    print("--------myDeck provider updated---------");
+    print(myDeckList);
+    notifyListeners();
   }
 
   Future<bool> login() async {

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:test_project/Views/Home/DecksScreen/deck_list_screen.dart';
 import 'package:test_project/auth_provider.dart';
-import 'deck_list_screen.dart';
 import 'stats_screen.dart';
 import 'market_screen.dart';
 
