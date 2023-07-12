@@ -79,8 +79,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     try {
       print("=======email $email password $password ==========");
-      //loginUser(email, password);
-      LoginState().userId = 1;
+      loginUser(email, password);
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("로그인 성공")));
       moveToHomeScreen();

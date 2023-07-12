@@ -17,8 +17,8 @@ class DeckListScreen extends StatefulWidget {
   State<DeckListScreen> createState() => _DeckListScreenState();
 }
 
-class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProviderStateMixin {
-
+class _DeckListScreenState extends State<DeckListScreen>
+    with SingleTickerProviderStateMixin {
   List<Deck> myDeckList = [];
   List<Deck> shownDeckList = [];
   late int userId;
@@ -38,7 +38,7 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
       vsync: this,
     );
     _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
-  
+
     final loginState = Provider.of<LoginState>(context, listen: false);
     setState(() {
       userId = loginState.userId;
@@ -73,32 +73,31 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
   @override
   Widget build(BuildContext context) {
     debugPrint("UserId is $userId!!!!!!!!!!!!!");
-    
+
     print("the total list is $myDeckList");
 
     return Scaffold(
-      body: myDeckList.isEmpty?
-        const Center(
-          child: Text(
-            '덱을 추가하세요',
-            style: TextStyle(
-              fontSize: 24.0,
-              color: Colors.grey,
-              fontWeight: FontWeight.bold,
+      body: myDeckList.isEmpty
+          ? const Center(
+              child: Text(
+                '덱을 추가하세요',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            )
+          : Column(
+              children: [
+                deckSearchBar(),
+                Expanded(
+                  child: ListView.builder(
+                      itemCount: shownDeckList.length,
+                      itemBuilder: deckItemBuilder),
+                ),
+              ],
             ),
-          ),
-        ):
-        Column(
-          children: [
-            deckSearchBar(),
-            Expanded(
-              child: ListView.builder(
-              itemCount: shownDeckList.length,
-              itemBuilder: deckItemBuilder
-                  ),
-            ),
-          ],
-        ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
@@ -106,9 +105,10 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
           //   moveToAddDeckScreen(context);
           // }),
           if (_isExpanded) const SizedBox(height: 16.0),
-          if (_isExpanded) buildCircularButton(Icons.photo_library, () {
-            moveToAddDeckScreen(context);
-          }),
+          if (_isExpanded)
+            buildCircularButton(Icons.photo_library, () {
+              moveToAddDeckScreen(context);
+            }),
           if (_isExpanded) const SizedBox(height: 16.0),
           FloatingActionButton(
             child: Icon(_isExpanded ? Icons.close : Icons.add),
@@ -137,99 +137,101 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
               }
             },
             inputfieldBuilder:
-              (context, tec, fn, error, onChanged, onSubmitted) {
-            return ((context, sc, tags, onTagDelete) {
-              double _distanceToField;
-              return Padding(
-                padding: const EdgeInsets.all(10.0),
-                child: TextField(
-                  controller: tec,
-                  focusNode: fn,
-                  decoration: InputDecoration(
-                    isDense: true,
-                    border: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromARGB(255, 74, 137, 92),
-                        width: 3.0,
+                (context, tec, fn, error, onChanged, onSubmitted) {
+              return ((context, sc, tags, onTagDelete) {
+                double _distanceToField;
+                return Padding(
+                  padding: const EdgeInsets.all(10.0),
+                  child: TextField(
+                    controller: tec,
+                    focusNode: fn,
+                    decoration: InputDecoration(
+                      isDense: true,
+                      border: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromARGB(255, 74, 137, 92),
+                          width: 3.0,
+                        ),
                       ),
-                    ),
-                    focusedBorder: const OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: Color.fromARGB(255, 74, 137, 92),
-                        width: 3.0,
+                      focusedBorder: const OutlineInputBorder(
+                        borderSide: BorderSide(
+                          color: Color.fromARGB(255, 74, 137, 92),
+                          width: 3.0,
+                        ),
                       ),
-                    ),
-                    helperText: '태그를 입력하세요',
-                    helperStyle: const TextStyle(
-                      color: Color.fromARGB(255, 74, 137, 92),
-                    ),
-                    //hintText: tagsController.hasTags ? '' : "태그를 입력하세요",
-                    errorText: error,
-                    prefixIconConstraints:
-                        BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.74),
-                    prefixIcon: tags.isNotEmpty
-                        ? SingleChildScrollView(
-                            controller: sc,
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                                children: tags.map((String tag) {
-                              return Container(
-                                decoration: const BoxDecoration(
-                                  borderRadius: BorderRadius.all(
-                                    Radius.circular(20.0),
-                                  ),
-                                  color: Color.fromARGB(255, 74, 137, 92),
-                                ),
-                                margin: const EdgeInsets.symmetric(
-                                    horizontal: 5.0),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 10.0, vertical: 5.0),
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    InkWell(
-                                      child: Text(
-                                        '#$tag',
-                                        style: const TextStyle(color: Colors.white),
-                                      ),
-                                      onTap: () {
-                                        print("$tag 선택");
-                                      },
+                      helperText: '태그를 입력하세요',
+                      helperStyle: const TextStyle(
+                        color: Color.fromARGB(255, 74, 137, 92),
+                      ),
+                      //hintText: tagsController.hasTags ? '' : "태그를 입력하세요",
+                      errorText: error,
+                      prefixIconConstraints: BoxConstraints(
+                          maxWidth: MediaQuery.of(context).size.width * 0.74),
+                      prefixIcon: tags.isNotEmpty
+                          ? SingleChildScrollView(
+                              controller: sc,
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
+                                  children: tags.map((String tag) {
+                                return Container(
+                                  decoration: const BoxDecoration(
+                                    borderRadius: BorderRadius.all(
+                                      Radius.circular(20.0),
                                     ),
-                                    const SizedBox(width: 4.0),
-                                    InkWell(
-                                      child: const Icon(
-                                        Icons.cancel,
-                                        size: 14.0,
-                                        color: Colors.grey,
+                                    color: Color.fromARGB(255, 74, 137, 92),
+                                  ),
+                                  margin: const EdgeInsets.symmetric(
+                                      horizontal: 5.0),
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 10.0, vertical: 5.0),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      InkWell(
+                                        child: Text(
+                                          '#$tag',
+                                          style: const TextStyle(
+                                              color: Colors.white),
+                                        ),
+                                        onTap: () {
+                                          print("$tag 선택");
+                                        },
                                       ),
-                                      onTap: () {
-                                        onTagDelete(tag);
-                                      },
-                                    )
-                                  ],
-                                ),
-                              );
-                            }).toList()),
-                          )
-                        : null,
+                                      const SizedBox(width: 4.0),
+                                      InkWell(
+                                        child: const Icon(
+                                          Icons.cancel,
+                                          size: 14.0,
+                                          color: Colors.grey,
+                                        ),
+                                        onTap: () {
+                                          onTagDelete(tag);
+                                        },
+                                      )
+                                    ],
+                                  ),
+                                );
+                              }).toList()),
+                            )
+                          : null,
+                    ),
+                    onChanged: onChanged,
+                    onSubmitted: onSubmitted,
                   ),
-                  onChanged: onChanged,
-                  onSubmitted: onSubmitted,
-                ),
-              );
-            });
-                  },
-                ),
-        ElevatedButton(
-          style: ButtonStyle(
-            backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+                );
+              });
+            },
           ),
-          onPressed: () {
-            tagsController.clearTags();
-          },
-          child: const Text('태그 지우기'),
-        )
+          ElevatedButton(
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
+            ),
+            onPressed: () {
+              tagsController.clearTags();
+            },
+            child: const Text('태그 지우기'),
+          )
         ],
       ),
     );
@@ -238,8 +240,9 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
   void filterSearchResults(String query) {
     setState(() {
       shownDeckList = myDeckList
-        .where((item) => item.deckName.toLowerCase().contains(query.toLowerCase()))
-        .toList();
+          .where((item) =>
+              item.deckName.toLowerCase().contains(query.toLowerCase()))
+          .toList();
     });
   }
 
@@ -259,20 +262,20 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     bool isBookmarked = deck.deckFavorite;
 
     void shareDeck() async {
-      final snackBar = SnackBar(
-        content: Text("shared deck $index")
-      );
-      ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+      final snackBar = SnackBar(content: Text("shared deck $index"));
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
 
     void bookmarkDeck() async {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("bookmarked deck ${deck.deckName}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("bookmarked deck ${deck.deckName}")));
       isBookmarked = true;
       bookmarkDeckDB(deck.id);
     }
 
     void unbookmarkDeck() async {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("unbookmarked deck ${deck.deckName}")));
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("unbookmarked deck ${deck.deckName}")));
       isBookmarked = false;
       unbookmarkDeckDB(deck.id);
     }
@@ -282,33 +285,34 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
         context: context,
         builder: (context) {
           return Theme(
-            data: Theme.of(context).copyWith(
-              dialogTheme: DialogTheme(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
+              data: Theme.of(context).copyWith(
+                dialogTheme: DialogTheme(
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
                 ),
               ),
-            ), 
-            child: AlertDialog(
-              //title: Text('Delete Deck'),
-              contentPadding: const EdgeInsets.all(16.0),
-              content: const Text('덱을 정말 삭제하시겠습니까'),
-              actions: [
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false); // Return false to indicate cancel
-                  },
-                  child: const Text('아니오'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(true); // Return true to indicate confirmation
-                  },
-                  child: const Text('예'),
-                ),
-              ],
-            )
-          );
+              child: AlertDialog(
+                //title: Text('Delete Deck'),
+                contentPadding: const EdgeInsets.all(16.0),
+                content: const Text('덱을 정말 삭제하시겠습니까'),
+                actions: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(false); // Return false to indicate cancel
+                    },
+                    child: const Text('아니오'),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context)
+                          .pop(true); // Return true to indicate confirmation
+                    },
+                    child: const Text('예'),
+                  ),
+                ],
+              ));
         },
       );
 
@@ -327,12 +331,12 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
     }
 
     return Slidable(
-      key: Key(deck.id.toString()),
-      endActionPane: ActionPane(
-        motion: const ScrollMotion(),
-        children: [
-          Builder( //share button
-            builder: (cont) {
+        key: Key(deck.id.toString()),
+        endActionPane: ActionPane(
+          motion: const ScrollMotion(),
+          children: [
+            Builder(//share button
+                builder: (cont) {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
@@ -349,14 +353,13 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
                   size: 25,
                 ),
               );
-            }
-          ),
-          Builder( //bookmark button
-            builder: (cont) {
+            }),
+            Builder(//bookmark button
+                builder: (cont) {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
-                  isBookmarked? unbookmarkDeck: bookmarkDeck;
+                  isBookmarked ? unbookmarkDeck : bookmarkDeck;
                 },
                 style: ElevatedButton.styleFrom(
                   shape: const CircleBorder(),
@@ -364,15 +367,14 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
                   padding: const EdgeInsets.all(10),
                 ),
                 child: Icon(
-                  isBookmarked? Icons.bookmark: Icons.bookmark_border,
+                  isBookmarked ? Icons.bookmark : Icons.bookmark_border,
                   color: Colors.black,
                   size: 25,
                 ),
               );
-            }
-          ),
-          Builder( //delete button
-            builder: (cont) {
+            }),
+            Builder(//delete button
+                builder: (cont) {
               return ElevatedButton(
                 onPressed: () {
                   Slidable.of(cont)!.close();
@@ -389,102 +391,86 @@ class _DeckListScreenState extends State<DeckListScreen> with SingleTickerProvid
                   size: 25,
                 ),
               );
-            }
-          ),
-        ],
-      ),
-
-      child: GestureDetector(
-        onTap: () {
-          moveToDeckScreen(context, deck);
-        },
-        child: Container(
-          margin: const EdgeInsets.all(10),
-          height: 80,
-          child: Card(
-            elevation: 4.0,
-            color: Colors.grey,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.0),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Container(
-                    //width: double.infinity,
-                    alignment: Alignment.centerLeft,
-                    margin: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      deck.deckName,
-                      style: const TextStyle(
-                        color: Colors.white, // Text color
-                        fontSize: 16.0, // Text size
-                        fontFamily: 'Pretendard', // Custom font family
-                        fontWeight: FontWeight.bold)
-                    ),
-                  ),
-                ),
-                Container(
-                  alignment: Alignment.centerRight,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      moveToLearnScreen(context, deck);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      shape: const CircleBorder(),
-                      backgroundColor: Colors.white,
-                      padding: const EdgeInsets.all(2),
-                    ),
-                    child: const Icon(
-                      Icons.play_arrow,
-                      color: Colors.greenAccent,
-                      size: 30,
-                    ),
-                  ),
-                )
-              ],
-            ),
-          )
+            }),
+          ],
         ),
-      )
-
-    );
+        child: GestureDetector(
+          onTap: () {
+            moveToDeckScreen(context, deck);
+          },
+          child: Container(
+              margin: const EdgeInsets.all(10),
+              height: 80,
+              child: Card(
+                elevation: 4.0,
+                color: Colors.grey,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12.0),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Container(
+                        //width: double.infinity,
+                        alignment: Alignment.centerLeft,
+                        margin: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Text(deck.deckName,
+                            style: const TextStyle(
+                                color: Colors.white, // Text color
+                                fontSize: 16.0, // Text size
+                                fontFamily: 'Pretendard', // Custom font family
+                                fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    Container(
+                      alignment: Alignment.centerRight,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          moveToLearnScreen(context, deck);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          backgroundColor: Colors.white,
+                          padding: const EdgeInsets.all(2),
+                        ),
+                        child: const Icon(
+                          Icons.play_arrow,
+                          color: Colors.greenAccent,
+                          size: 30,
+                        ),
+                      ),
+                    )
+                  ],
+                ),
+              )),
+        ));
   }
-
 
   void moveToDeckScreen(BuildContext context, Deck deck) {
     print("move to home");
 
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => DeckScreen(curDeck : deck)
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => DeckScreen(curDeck: deck)),
     );
   }
 
   void moveToLearnScreen(BuildContext context, Deck deck) {
     print("move to home");
 
-    final snackBar = SnackBar(
-      content: Text("Learn deck ${deck.deckName}")
-    );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar); 
+    final snackBar = SnackBar(content: Text("Learn deck ${deck.deckName}"));
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
 
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => LearnDeckScreen(deck: deck)
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => LearnDeckScreen(deck: deck)),
     );
   }
 
   void moveToAddDeckScreen(BuildContext context) {
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => const AddDeckScreen()
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => const AddDeckScreen()),
     );
   }
 }

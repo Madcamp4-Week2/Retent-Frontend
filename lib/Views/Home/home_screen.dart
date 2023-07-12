@@ -23,8 +23,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final loginState = Provider.of<LoginState>(context, listen: true);
-
     final email = '';
 
     print(email);
