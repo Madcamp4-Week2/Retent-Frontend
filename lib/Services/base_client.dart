@@ -26,6 +26,7 @@ class BaseClient {
     var _payload = json.encode(object);
 
     var response = await client.post(uri,
+
         body: _payload, headers: {"Content-Type": "application/json"});
     if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
@@ -36,7 +37,10 @@ class BaseClient {
     var uri = Uri.parse(baseUrl + api); //fill uri
     var _payload = json.encode(object);
 
-    var response = await client.put(uri, body: _payload);
+
+    var response = await client.put(uri, 
+      body: _payload,
+      headers: {"Content-Type": "application/json"});
     if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
     } else {}
@@ -46,7 +50,9 @@ class BaseClient {
     var uri = Uri.parse(baseUrl + api); //fill uri
     var _payload = json.encode(object);
 
-    var response = await client.patch(uri, body: _payload);
+    var response = await client.patch(uri, 
+      body: _payload,
+      headers: {"Content-Type": "application/json"});
     if (response.statusCode == 200) {
       return response.body;
     } else {}

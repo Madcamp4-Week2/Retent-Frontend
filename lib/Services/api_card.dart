@@ -37,7 +37,7 @@ void deleteCardDB(int cardId) async {
 
 Future<Flashcard?> patchCardDB(int deckId, String question, String answer) async {
   var responseBody = await BaseClient().patch(
-    '/flash-card/cards/$deckId',
+    '/flash-card/cards/$deckId/',
     {"question" : question, "answer" : answer, "deck" : deckId}
   );
   if (responseBody == null) {

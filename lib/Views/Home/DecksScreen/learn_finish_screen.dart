@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Services/api_history.dart';
-import 'package:test_project/Views/Home/deck_list_screen.dart';
+import 'package:test_project/Views/Home/home_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/learn_deck_screen.dart';
 
 class LearnFinishScreen extends StatefulWidget {
   final int rightCount;
   final int wrongCount;
   final double totalTime;
-  final int deckId;
+  final Deck deck;
 
   LearnFinishScreen({super.key,
     required this.rightCount,
     required this.wrongCount,
     required this.totalTime,
-    required this.deckId,
+    required this.deck,
   });
 
   @override
@@ -22,11 +24,13 @@ class LearnFinishScreen extends StatefulWidget {
 
 class _LearnFinishScreenState extends State<LearnFinishScreen> {
   late double accuracy;
+  late int totalCount;
 
   @override
   void initState() {
     super.initState();
-    accuracy = widget.rightCount/ (widget.rightCount + widget.wrongCount);
+    totalCount = widget.rightCount + widget.wrongCount;
+    accuracy = widget.rightCount/ totalCount;
   }
 
   @override
@@ -83,9 +87,9 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
                   Column(
                     children: [
                       buildTextWithStyle("${widget.totalTime}", Colors.grey),
-                      buildTextWithStyle("${(widget.totalTime/(widget.rightCount+widget.wrongCount)).round()}", Colors.grey),
+                      buildTextWithStyle("${(widget.totalTime/totalCount).round()}", Colors.grey),
                       const SizedBox(height: 20,),
-                      buildTextWithStyle("${widget.rightCount+widget.wrongCount}", Colors.grey),
+                      buildTextWithStyle("$totalCount", Colors.grey),
                       buildTextWithStyle("${widget.rightCount}", Colors.green),
                       buildTextWithStyle("${widget.wrongCount}", Colors.red),
                     ],
@@ -101,6 +105,7 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
               margin: const EdgeInsets.all(5),
               child: ElevatedButton(
                 onPressed: () {
+                  saveHistory();
                   moveToDeckListScreen();
                 },
                 style: ElevatedButton.styleFrom(
@@ -125,6 +130,7 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
               margin: const EdgeInsets.all(5),
               child: OutlinedButton(
                 onPressed: () {
+                  saveHistory();
                   restartLearn();
                 },
                 style: ElevatedButton.styleFrom(
@@ -165,19 +171,24 @@ class _LearnFinishScreenState extends State<LearnFinishScreen> {
   }
 
   void saveHistory() {
-    postHistoryDB(widget.deckId, widget.totalTime, accuracy);
+    postHistoryDB(widget.deck.id, widget.totalTime/totalCount, accuracy);
   }
 
   void moveToDeckListScreen() {
     Navigator.push(
       context, 
       MaterialPageRoute(
-        builder: (context) => DeckListScreen()
+        builder: (context) =>HomeScreen()
       ),
     );
   }
 
   void restartLearn() {
-
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => LearnDeckScreen(deck: widget.deck)
+      ),
+    );
   }
 }

@@ -5,6 +5,8 @@ import 'package:provider/provider.dart';
 import 'package:test_project/Views/Login/signin_screen.dart';
 import 'package:test_project/Views/Login/start_screen.dart';
 import 'package:test_project/auth_provider.dart';
+import 'package:intl/intl.dart';
+import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
 
@@ -12,7 +14,7 @@ void main() {
 
   KakaoSdk.init(nativeAppKey: 'eb740906eb300632214b70239c3013a7');
 
-  runApp(const MyApp());
+  initializeDateFormatting().then((_) {runApp(const MyApp());});
 }
 
 //root of the entire app

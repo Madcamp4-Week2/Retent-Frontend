@@ -42,8 +42,10 @@ void signinUserDB(
 }
 
 void signKakao(String token) async {
+  print('========token======== $token');
   var response =
       await BaseClient().post('/kakao-login/', {"kakao_token": token});
+
   if (response != null) {
     Map<String, dynamic> responseData = jsonDecode(response);
     String key = responseData['access_token'];

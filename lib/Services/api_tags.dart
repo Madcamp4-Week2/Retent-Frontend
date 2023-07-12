@@ -5,7 +5,7 @@ import 'package:test_project/Models/tag.dart';
 import 'package:test_project/Services/base_client.dart';
 
 //TAGS
-Future<List<Tag>> getMyTagsDB(int userId) async { //fix. MY tags
+Future<List<Tag>> getTagsDB(int userId) async {
   var response = await BaseClient().get('/flash-card/tags');
   if (response == null) {
     debugPrint("getMyDecks unsuccessful");

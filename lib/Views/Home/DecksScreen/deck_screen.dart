@@ -3,39 +3,69 @@ import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Services/api_card.dart';
 import 'package:test_project/Services/api_deck.dart';
+import 'package:test_project/Services/api_pdf.dart';
 import 'package:test_project/Services/base_client.dart';
-import 'package:test_project/Views/Home/edit_card_screen.dart';
+import 'package:test_project/Views/Add/add_card_screen.dart';
+import 'package:test_project/Views/Home/DecksScreen/edit_card_screen.dart';
 
 import 'package:test_project/Models/flashcard.dart';
 
 
 class DeckScreen extends StatefulWidget {
-  final Deck deck;
-  
-  const DeckScreen({super.key, required this.deck});
+  final Deck curDeck;
+
+  const DeckScreen({super.key, required this.curDeck});
 
   @override
   State<DeckScreen> createState() => _DeckScreenState();
 }
 
-class _DeckScreenState extends State<DeckScreen> {
+class _DeckScreenState extends State<DeckScreen> with SingleTickerProviderStateMixin {
   List<Flashcard> cardList = [];
   late Deck deck;
+
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+  bool _isExpanded = false;
+
+  
+
+  @override
+  void initState() {
+    super.initState();
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_animationController);
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _toggleExpanded() {
+    setState(() {
+      _isExpanded = !_isExpanded;
+      if (_isExpanded) {
+        _animationController.forward();
+      } else {
+        _animationController.reverse();
+      }
+    });
+  }
 
   void getMyCards(deckId) async {
     cardList = await getMyCardsDB(deckId);
     setState(() {});
   }
-
-  @override
-  void initState() {
-    super.initState();
-  }
   
   @override
   Widget build(BuildContext context) {
     setState(() {
-      deck = widget.deck;
+      deck = widget.curDeck;
       int deckId = deck.id;
       print(deckId);
       getMyCards(deckId);
@@ -92,7 +122,7 @@ class _DeckScreenState extends State<DeckScreen> {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: const EdgeInsets.all(24.0),
               child: Row(
                 children: [
                   Text(
@@ -115,6 +145,21 @@ class _DeckScreenState extends State<DeckScreen> {
                 ]
               ),
             ),
+            (widget.curDeck.description != null)?
+            Container(
+              padding: EdgeInsets.all(16),
+              width: double.infinity,
+              height: 60,
+              child: Text(
+                widget.curDeck.description!,
+                style: const TextStyle(
+                    color: Colors.black, // Text color
+                    fontSize: 16.0, // Text size
+                    fontFamily: 'Pretendard', // Custom font family
+                    fontWeight: FontWeight.bold
+                ),
+              )
+            ) : const SizedBox(height: 10,),
             Expanded(
               child: ListView.builder(
                 itemCount: cardList.length,
@@ -122,6 +167,33 @@ class _DeckScreenState extends State<DeckScreen> {
             )
           ]
         ),
+      ),
+      floatingActionButton: Column(
+        mainAxisAlignment: MainAxisAlignment.end,
+        children: [
+          if (_isExpanded) buildCircularButton(Icons.picture_as_pdf, () {
+            generatePDFcards(context, deck.id);
+          }),
+          if (_isExpanded) const SizedBox(height: 16.0),
+          if (_isExpanded) buildCircularButton(Icons.photo_library, () {
+            moveToAddCardScreen(context);
+          }),
+          if (_isExpanded) const SizedBox(height: 16.0),
+          FloatingActionButton(
+            child: Icon(_isExpanded ? Icons.close : Icons.add),
+            onPressed: _toggleExpanded,
+          ),
+          ]
+        )  ,
+    );
+  }
+
+  Widget buildCircularButton(IconData icon, VoidCallback onPressed) {
+    return ScaleTransition(
+      scale: _animation,
+      child: FloatingActionButton(
+        child: Icon(icon),
+        onPressed: onPressed,
       ),
     );
   }
@@ -258,6 +330,22 @@ class _DeckScreenState extends State<DeckScreen> {
     setState(() {
       cardList.removeAt(index);
     });
+  }
+
+  void addPDF(BuildContext context) {
+    
+
+  }
+
+  void moveToAddCardScreen(BuildContext context) {
+    Navigator.push(
+      context, 
+      MaterialPageRoute(
+        builder: (context) => AddCardScreen(
+          newDeck: widget.curDeck,
+        )
+      ),
+    );
   }
 
   void moveToEditCardScreen(BuildContext context, int index) {
