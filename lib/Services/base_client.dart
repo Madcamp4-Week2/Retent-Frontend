@@ -9,14 +9,16 @@ const String baseUrl = 'https://70d5-143-248-38-159.ngrok-free.app/retent';
 class BaseClient {
   var client = http.Client();
 
-  Future<dynamic> get(String api) async {
-    // TODO headers????
-    var uri = Uri.parse(baseUrl + api); //fill uri
+  Future<dynamic> get(String api, {Map<String, String>? headers}) async {
+    var uri = Uri.parse(baseUrl + api);
 
-    var response = await client.get(uri);
-    if (response.statusCode == 200) {
+    var response = await client.get(uri, headers: headers);
+    if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
-    } else {}
+    } else {
+      // Consider throwing an error if the status code is not 2xx
+      throw Exception('Failed to load data');
+    }
   }
 
   Future<dynamic> post(String api, dynamic object) async {
@@ -24,9 +26,9 @@ class BaseClient {
     var _payload = json.encode(object);
 
     var response = await client.post(uri,
-        body: _payload, 
-        headers: {"Content-Type": "application/json"});
-    if (response.statusCode == 201 || response.statusCode == 200) {
+
+        body: _payload, headers: {"Content-Type": "application/json"});
+    if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
     } else {}
   }
@@ -35,10 +37,11 @@ class BaseClient {
     var uri = Uri.parse(baseUrl + api); //fill uri
     var _payload = json.encode(object);
 
+
     var response = await client.put(uri, 
       body: _payload,
       headers: {"Content-Type": "application/json"});
-    if (response.statusCode == 200) {
+    if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
     } else {}
   }
@@ -59,7 +62,7 @@ class BaseClient {
     var uri = Uri.parse(baseUrl + api); //fill uri
 
     var response = await client.delete(uri);
-    if (response.statusCode == 200) {
+    if (response.statusCode <= 300 && response.statusCode >= 200) {
       return response.body;
     } else {}
   }
