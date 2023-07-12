@@ -1,16 +1,30 @@
 # Retent
+- OpenAI API를 활용하여 PDF를 플래시카드로 만들어주는 Android 기반 어플리케이션입니다.
+- PDF 문서 내용을 플래시 카드로 만들어 사용자의 학습을 돕습니다.
 
-A new Flutter project.
+## 팀원
+  * 유경미
+  * 윤인규
+ 
+  
+## 개발 환경
+- **OS**: Android (minSdk: 19, targetSdk: 31)
+- **Language**: Flask
+- **IDE**: Visual Studio Code
+- **Target Device**: Galaxy S10
 
-## Getting Started
 
-This project is a starting point for a Flutter application.
+## API 명세서
+* [api 명세서](https://docs.google.com/spreadsheets/d/1I5m760SvD_AmWcNnrHvrZFp5nZMLsGAL/edit#gid=990061567)
+* [swagger](https://70d5-143-248-38-159.ngrok-free.app/swagger/)
 
-A few resources to get you started if this is your first Flutter project:
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+## 기능 설명
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+### 기능 1 : PDF로 플래시카드 만들기
+- 사용자가 PDF를 업로드하면 OCR 모듈을 통해 PDF를 Text 파일로 변환합니다.
+- 변환한 Text 내용을 기반으로 OpenAI를 활용하여 문제를 만듭니다.
+
+### 기능 1 : PDF로 플래시카드 만들기
+- 사용자가 PDF를 업로드하면 OCR 모듈을 통해 PDF를 Text 파일로 변환합니다.
+- 변환한 Text 내용을 기반으로 OpenAI를 활용하여 문제를 만듭니다.
