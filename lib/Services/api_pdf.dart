@@ -9,7 +9,8 @@ import 'package:path/path.dart' as p;
 import 'dart:io';
 
 Future<List<Flashcard>> getCardsDB(int deckId) async {
-  var responseBody = await BaseClient().get('/flash-card/cards/deck_cards/$deckId');
+  var responseBody =
+      await BaseClient().get('/flash-card/cards/deck_cards/$deckId');
   print("getmyCards response is $responseBody");
   if (responseBody == null) {
     debugPrint("getMyCards unsuccessfull");
@@ -17,9 +18,6 @@ Future<List<Flashcard>> getCardsDB(int deckId) async {
   }
   return flashcardFromJson(responseBody);
 }
-
-
-
 
 void generatePDFcards(BuildContext context, int deckId) async {
   Future<FilePickerResult?> pickPDF() async {
@@ -35,13 +33,15 @@ void generatePDFcards(BuildContext context, int deckId) async {
     if (selectedFile == null) return;
 
     String fileName = p.basename(selectedFile!.path);
-    String url = '$baseUrl/flash-card/uploading-pdf/'; // Replace with your server's URL + retent
+    String url =
+        '$baseUrl/flash-card/uploading-pdf/'; // Replace with your server's URL + retent
 
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.fields['deckId'] = deckId.toString();
 
     request.files.add(
-      await http.MultipartFile.fromPath('file', selectedFile!.path, filename: fileName),
+      await http.MultipartFile.fromPath('file', selectedFile!.path,
+          filename: fileName),
     );
 
     var response = await request.send();
@@ -84,4 +84,4 @@ void generatePDFcards(BuildContext context, int deckId) async {
       },
     );
   }
-} 
+}

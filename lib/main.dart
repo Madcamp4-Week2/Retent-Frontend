@@ -9,12 +9,13 @@ import 'package:intl/intl.dart';
 import 'package:intl/date_symbol_data_local.dart';
 
 void main() {
-
   WidgetsFlutterBinding.ensureInitialized();
 
   KakaoSdk.init(nativeAppKey: 'eb740906eb300632214b70239c3013a7');
 
-  initializeDateFormatting().then((_) {runApp(const MyApp());});
+  initializeDateFormatting().then((_) {
+    runApp(const MyApp());
+  });
 }
 
 //root of the entire app
@@ -36,4 +37,3 @@ class MyApp extends StatelessWidget {
     );
   }
 }
-

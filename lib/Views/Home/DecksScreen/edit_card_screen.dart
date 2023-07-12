@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:provider/provider.darts';
 import 'package:test_project/Models/deck.dart';
 import 'package:test_project/Models/tag.dart';
 import 'package:test_project/Services/api_card.dart';
@@ -15,7 +15,7 @@ import 'package:test_project/auth_provider.dart';
 
 class EditCardScreen extends StatefulWidget {
   final Flashcard flashcard;
-  
+
   const EditCardScreen({super.key, required this.flashcard});
 
   @override
@@ -39,7 +39,8 @@ class _EditCardScreenState extends State<EditCardScreen> {
   late List<Deck> myDeckList = [];
 
   final TextEditingController textEditingController = TextEditingController();
-  final TextEditingController questionEditingController = TextEditingController();
+  final TextEditingController questionEditingController =
+      TextEditingController();
   final TextEditingController answerEditingController = TextEditingController();
 
   @override
@@ -73,13 +74,13 @@ class _EditCardScreenState extends State<EditCardScreen> {
 
     return Scaffold(
       appBar: AppBar(
-         actions: [
+        actions: [
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: () {
               saveEditedCard(); // 지금 변경사항을 저장
-              ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("변경사항을 저장했습니다")
-    ));
+              ScaffoldMessenger.of(context)
+                  .showSnackBar(SnackBar(content: Text("변경사항을 저장했습니다")));
             },
           ),
           IconButton(
@@ -89,7 +90,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
             },
           ),
         ],
-        title: const Text('카드 수정하기'), 
+        title: const Text('카드 수정하기'),
       ),
       body: Container(
         margin: const EdgeInsets.all(20),
@@ -102,19 +103,19 @@ class _EditCardScreenState extends State<EditCardScreen> {
                 child: DropdownButton2(
                   hint: const Text('덱을 고르세요  '),
                   value: selectedDeck,
-                  items: myDeckList.map((Deck item) => DropdownMenuItem(
-                    value: item.id,
-                    child: Text(item.deckName))
-                    ).toList(),
+                  items: myDeckList
+                      .map((Deck item) => DropdownMenuItem(
+                          value: item.id, child: Text(item.deckName)))
+                      .toList(),
                   onChanged: (value) {
                     setState(() {
                       selectedDeck = value as int?;
-                      print("----------selected value is $selectedDeck---------");
-                    }); 
+                      print(
+                          "----------selected value is $selectedDeck---------");
+                    });
                   },
-                  iconStyleData: const IconStyleData(
-                    icon: Icon(Icons.expand_circle_down)
-                  ),
+                  iconStyleData:
+                      const IconStyleData(icon: Icon(Icons.expand_circle_down)),
                   dropdownStyleData: DropdownStyleData(
                     maxHeight: 400,
                     width: 170,
@@ -133,14 +134,22 @@ class _EditCardScreenState extends State<EditCardScreen> {
                     searchInnerWidgetHeight: 50,
                     searchInnerWidget: Container(
                       height: 50,
-                      padding: const EdgeInsets.only(top: 8, bottom: 4, right: 8, left: 8,),
+                      padding: const EdgeInsets.only(
+                        top: 8,
+                        bottom: 4,
+                        right: 8,
+                        left: 8,
+                      ),
                       child: TextFormField(
                         expands: true,
                         maxLines: null,
                         controller: textEditingController,
                         decoration: InputDecoration(
                           isDense: true,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8,),
+                          contentPadding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 8,
+                          ),
                           //hintText: '무슨 덱으로 바꿀까요',
                           hintStyle: const TextStyle(fontSize: 12),
                           border: OutlineInputBorder(
@@ -170,7 +179,7 @@ class _EditCardScreenState extends State<EditCardScreen> {
                   borderRadius: BorderRadius.circular(12.0),
                 ),
                 child: Container(
-                  margin:const EdgeInsets.all(20),
+                  margin: const EdgeInsets.all(20),
                   width: double.infinity,
                   alignment: Alignment.center,
                   child: Column(
@@ -194,7 +203,9 @@ class _EditCardScreenState extends State<EditCardScreen> {
                           // You can update the flashcard question using setState or any other mechanism
                         },
                       ),
-                      const SizedBox(height: 20,),
+                      const SizedBox(
+                        height: 20,
+                      ),
                       TextFormField(
                         controller: answerEditingController,
                         //initialValue: widget.flashcard.answer,
@@ -222,7 +233,6 @@ class _EditCardScreenState extends State<EditCardScreen> {
           ],
         ),
       ),
-
     );
   }
 
@@ -232,10 +242,9 @@ class _EditCardScreenState extends State<EditCardScreen> {
     final newDeck = selectedDeck;
     // TODO db로 현재 상태를 보냄 - patch
 
-    if(newDeck == null) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("덱 안고름")
-      )); 
+    if (newDeck == null) {
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("덱 안고름")));
     } else {
       patchCardDB(newDeck, newQuestion, newAnswer);
     }
