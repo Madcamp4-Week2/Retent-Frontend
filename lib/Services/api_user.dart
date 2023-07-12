@@ -60,3 +60,31 @@ void signKakao(String token) async {
     throw Exception('Server login failed');
   }
 }
+
+Future<int> signinUser(
+    String email, String password1, String password2, String nickname) async {
+  print('=======$email $password1 $password2 $nickname ======');
+  var response = await BaseClient().post(
+    "/dj-rest-auth/registration/",
+    {
+      "email": email,
+      "password1": password1,
+      "password2": password2,
+      "nickname": nickname
+    },
+  );
+
+  if (response != null) {
+    Map<String, dynamic> responseData = jsonDecode(response);
+    int pk = responseData['user']['pk'];
+    String key = responseData['access'];
+    LoginState().updateToken(key);
+
+    LoginState().updateUserId(pk);
+    print('=========userId $pk ========');
+
+    return 200;
+  } else {
+    throw Exception('Failed to log in');
+  }
+}
