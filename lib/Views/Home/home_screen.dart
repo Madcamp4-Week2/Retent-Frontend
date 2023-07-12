@@ -6,11 +6,10 @@ import 'stats_screen.dart';
 import 'market_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-
   const HomeScreen({super.key});
 
   @override
-  State<HomeScreen> createState() =>  _HomeScreenState();
+  State<HomeScreen> createState() => _HomeScreenState();
 }
 
 class _HomeScreenState extends State<HomeScreen> {
@@ -26,7 +25,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final loginState = Provider.of<LoginState>(context, listen: true);
 
-    final email = loginState.email;
+    final email = '';
 
     print(email);
 
@@ -71,6 +70,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-
-

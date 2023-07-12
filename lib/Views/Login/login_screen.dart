@@ -1,14 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:test_project/Views/Home/home_screen.dart';
 import 'package:test_project/Views/Login/login_platform.dart';
-import 'package:http/http.dart' as http;
-import 'package:kakao_flutter_sdk_user/kakao_flutter_sdk_user.dart';
-
-import 'dart:convert'; //Json
-import 'dart:io';
-
-import 'package:test_project/auth_provider.dart'; //HttpsHeader
+import 'package:test_project/Services/api_user.dart'; // for ApiUser
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -33,29 +26,19 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.end,
           children: [
-            Consumer<LoginState>(
-              builder: (context, loginState, _) {
-                return TextField(
-                  controller: _emailController,
-                  onChanged: loginState.updateEmail,
-                  decoration: const InputDecoration(
-                    labelText: '이메일',
-                  ),
-                );
-              }
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(
+                labelText: '이메일',
+              ),
             ),
             const SizedBox(height: 24.0),
-            Consumer<LoginState>(
-              builder: (context, loginState, _) {
-                return TextField(
-                  controller: _passwordController,
-                  onChanged: loginState.updatePassword,
-                  decoration: const InputDecoration(
-                    labelText: '비밀번호',
-                  ),
-                  obscureText: true,
-                );
-              }
+            TextField(
+              controller: _passwordController,
+              decoration: const InputDecoration(
+                labelText: '비밀번호',
+              ),
+              obscureText: true,
             ),
             Spacer(),
             Container(
@@ -64,13 +47,14 @@ class _LoginScreenState extends State<LoginScreen> {
               margin: const EdgeInsets.all(5),
               child: ElevatedButton(
                 onPressed: () {
-                  Login();
+                  login();
                 },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
                   ),
-                  padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 16.0, vertical: 12.0),
                   elevation: 4.0,
                 ),
                 child: const Text(
@@ -87,22 +71,18 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
     );
   }
-  void Login() async {
-    final loginState = Provider.of<LoginState>(context, listen: false);
 
+  void login() async {
     final email = _emailController.text;
     final password = _passwordController.text;
 
-    loginState.updateEmail(email);
-    loginState.updatePassword(password);
-
-    print("${loginState.email}");
-
-    bool loginSuccess = await loginState.login();
-    if(loginSuccess) {
-      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("로그인 성공"))); 
+    try {
+      print("=======email $email password $password ==========");
+      loginUser(email, password);
+      ScaffoldMessenger.of(context)
+          .showSnackBar(const SnackBar(content: Text("로그인 성공")));
       moveToHomeScreen();
-    } else {
+    } catch (_) {
       showDialog(
         context: context,
         builder: (context) => AlertDialog(
@@ -125,10 +105,8 @@ class _LoginScreenState extends State<LoginScreen> {
     print("move to home");
 
     Navigator.push(
-      context, 
-      MaterialPageRoute(
-        builder: (context) => HomeScreen()
-      ),
+      context,
+      MaterialPageRoute(builder: (context) => HomeScreen()),
     );
   }
 }
