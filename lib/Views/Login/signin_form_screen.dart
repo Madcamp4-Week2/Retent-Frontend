@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:test_project/Services/api_user.dart';
 import 'package:test_project/Views/Home/home_screen.dart';
+import 'package:test_project/auth_provider.dart';
 
 class SignInFormScreen extends StatefulWidget {
   const SignInFormScreen({Key? key}) : super(key: key);
@@ -45,7 +46,8 @@ class _SignInFormScreenState extends State<SignInFormScreen> {
     } else {
       final result = await signinUser(
           email, password1, password2, nickname); // Call signinUser function
-      if (result == 200) moveToHomeScreen();
+      if (result == 200) LoginState().userId = 1;
+      moveToHomeScreen();
     }
   }
 

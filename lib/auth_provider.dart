@@ -6,23 +6,21 @@ import 'package:test_project/Services/api_deck.dart';
 class LoginState extends ChangeNotifier {
   static final LoginState _singleton = LoginState._internal();
 
-
   List<Deck> myDeckList = [];
-
-  void updateEmail(String value) {
-    email = value;
-    notifyListeners();
+  String email = '';
+  String token = '';
+  int userId = 1;
 
   factory LoginState() {
     return _singleton;
-
   }
 
   LoginState._internal();
 
-  String token = '';
-  int userId = 1;
-
+  void updateEmail(String value) {
+    email = value;
+    notifyListeners();
+  }
 
   void updateDeckList() async {
     myDeckList = await getMyDecksDB(userId);
@@ -31,12 +29,10 @@ class LoginState extends ChangeNotifier {
     notifyListeners();
   }
 
-
   void updateToken(String value) {
     token = value;
     notifyListeners();
   }
-
 
   void updateUserId(int value) {
     userId = value;
