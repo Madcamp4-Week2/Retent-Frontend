@@ -77,6 +77,7 @@ class _LoginScreenState extends State<LoginScreen> {
     final password = _passwordController.text;
 
     try {
+      print("=======email $email password $password ==========");
       loginUser(email, password);
       ScaffoldMessenger.of(context)
           .showSnackBar(const SnackBar(content: Text("로그인 성공")));
